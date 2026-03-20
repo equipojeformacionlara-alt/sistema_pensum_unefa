@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Pensum UNEFA</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #0002;
+        }
+
+        h2 {
+            color: #003366;
+            border-left: 5px solid #003366;
+            padding-left: 10px;
+        }
+
+        .materia {
+            background: #f8f9fc;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 5px solid #003366;
+        }
+
+        select {
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #003366;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #0055aa;
+        }
+
+        .estado {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .resultado-box {
+            background: #f0f6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 5px solid #0055aa;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>Sistema de Pensum UNEFA</header>
+
+<div class="container">
+
+    <p>Selecciona el estado de cada materia y presiona <strong>Evaluar Pensum</strong>.</p>
+
+    <div id="contenedor-materias"></div>
+
+    <button onclick="evaluarPensum()">Evaluar Pensum</button>
+
+    <div id="resultado"></div>
+
+</div>
+
+<script>
+    let pensum = null;
+
+    async function cargarPensum() {
+        const res = await fetch("http://localhost:4567/api/v1/pensum");
+        const data = await res.json();
+        pensum = data.pensum;
+        mostrarMaterias();
+    }
+
+    function mostrarMaterias() {
+        const cont = document.getElementById("contenedor-materias");
+
+        pensum.forEach(sem => {
+            const titulo = document.createElement("h2");
+            titulo.textContent = `Semestre ${sem.semestre}`;
+            cont.appendChild(titulo);
+
+            sem.materias.forEach(mat => {
+                const div = document.createElement("div");
+                div.className = "materia";
+
+                div.innerHTML = `
+                    <strong>${mat.codigo}</strong> - ${mat.nombre}<br>
+                    Estado:
+                    <select id="${mat.codigo}">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="aplazada">Aplazada</option>
+                    </select>
+                `;
+
+                cont.appendChild(div);
+            });
+        });
+    }
+
+    async function evaluarPensum() {
+        const estados = {};
+
+        pensum.forEach(sem => {
+            sem.materias.forEach(mat => {
+                const valor = document.getElementById(mat.codigo).value;
+                estados[mat.codigo] = valor;
+            });
+        });
+
+        const payload = {
+            estudiante_id: "12345678",
+            estados: estados
+        };
+
+        const res = await fetch("http://localhost:4567/api/v1/evaluar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        mostrarResultado(data.resultado);
+    }
+
+    function mostrarResultado(resultado) {
+        const cont = document.getElementById("resultado");
+        cont.innerHTML = "<h2>Resultado del Motor Académico</h2>";
+
+        resultado.forEach(sem => {
+            const titulo = document.createElement("h3");
+            titulo.textContent = `Semestre ${sem.semestre}`;
+            cont.appendChild(titulo);
+
+            sem.materias.forEach(mat => {
+                const div = document.createElement("div");
+                div.className = "resultado-box";
+
+                div.innerHTML = `
+                    <strong>${mat.codigo}</strong> - ${mat.nombre}<br>
+                    Estado: <span class="estado">${mat.estado}</span>
+                `;
+
+                cont.appendChild(div);
+            });
+        });
+    }
+
+    cargarPensum();
+</script>
+
+</body>
+</html>
