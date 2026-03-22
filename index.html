@@ -1,190 +1,475 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Sistema de Pensum UNEFA</title>
+  <meta charset="UTF-8">
+  <title>Sistema de Pensum UNEFA</title>
 
-    <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #eef2f7;
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Chart.js para el gráfico de progreso -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        header {
-            background: #003366;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 26px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+    }
 
-        .container {
-            width: 90%;
-            max-width: 1100px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #0002;
-        }
+    header {
+      background: #003366;
+      color: white;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        h2 {
-            color: #003366;
-            border-left: 5px solid #003366;
-            padding-left: 10px;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
 
-        .materia {
-            background: #f8f9fc;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border-left: 5px solid #003366;
-        }
+    header span {
+      font-size: 14px;
+      opacity: 0.9;
+    }
 
-        select {
-            padding: 6px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+    .container {
+      display: grid;
+      grid-template-columns: 1.1fr 1.9fr;
+      gap: 20px;
+      padding: 20px;
+    }
 
-        button {
-            background: #003366;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
+    .panel {
+      background: white;
+      border-radius: 8px;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
 
-        button:hover {
-            background: #0055aa;
-        }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #003366;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
 
-        .estado {
-            font-weight: bold;
-            color: #003366;
-        }
+    .materia {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
 
-        .resultado-box {
-            background: #f0f6ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 5px solid #0055aa;
-        }
-    </style>
+    .materia label {
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      background: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: #0055aa;
+    }
+
+    .btn-secondary {
+      background: #777;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #555;
+    }
+
+    #resultado {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    .cards-resumen {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .card-resumen {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      border-left: 4px solid #003366;
+      font-size: 13px;
+    }
+
+    .card-resumen .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .card-resumen .value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 3px;
+    }
+
+    .leyenda {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .leyenda-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .leyenda-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+
+    .estado-aprobada { background: #d4f8d4; }
+    .estado-disponible { background: #d4e8ff; }
+    .estado-bloqueada { background: #e0e0e0; }
+    .estado-no_aprobada { background: #ffd4d4; }
+
+    .lista-materias {
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 5px;
+      background: #fafafa;
+    }
+
+    .card-materia {
+      border-radius: 5px;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      border: 1px solid #ddd;
+    }
+
+    .card-materia .codigo {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .card-materia .semestre {
+      font-size: 11px;
+      color: #555;
+      margin-left: 5px;
+    }
+
+    .card-materia .requisitos {
+      font-size: 11px;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .card-materia .estado-tag {
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.05);
+      margin-left: 5px;
+    }
+
+    .estado-tag.aprobada { color: #1b5e20; }
+    .estado-tag.disponible { color: #0d47a1; }
+    .estado-tag.bloqueada { color: #424242; }
+    .estado-tag.no_aprobada { color: #b71c1c; }
+
+    .grafico-container {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 10px;
+      border: 1px solid #eee;
+      margin-bottom: 10px;
+    }
+
+    .grafico-container h3 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #003366;
+    }
+
+    @media print {
+      header, .btn, #resultado {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+      .container {
+        display: block;
+        padding: 0;
+      }
+      .panel {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<header>Sistema de Pensum UNEFA</header>
+<header>
+  <div>
+    <h1>Sistema de Pensum UNEFA</h1>
+    <span>Dashboard académico del estudiante</span>
+  </div>
+  <div>
+    <button class="btn btn-secondary" onclick="window.print()">Imprimir reporte</button>
+  </div>
+</header>
 
 <div class="container">
+  <!-- Panel izquierdo: selección de materias -->
+  <div class="panel">
+    <h2>1. Selección de materias aprobadas</h2>
+    <p style="font-size: 13px; margin-top: 0;">
+      Marque las materias que el estudiante ya tiene aprobadas y luego presione <strong>Evaluar</strong>.
+    </p>
 
-    <p>Selecciona el estado de cada materia y presiona <strong>Evaluar Pensum</strong>.</p>
+    <div id="contenedor"></div>
 
-    <div id="contenedor-materias"></div>
-
-    <button onclick="evaluarPensum()">Evaluar Pensum</button>
+    <button class="btn" onclick="enviar()">Evaluar</button>
 
     <div id="resultado"></div>
+  </div>
 
+  <!-- Panel derecho: dashboard -->
+  <div class="panel">
+    <h2>2. Dashboard académico</h2>
+
+    <div class="cards-resumen">
+      <div class="card-resumen">
+        <div class="label">Materias aprobadas</div>
+        <div class="value" id="res-aprobadas">0</div>
+      </div>
+      <div class="card-resumen">
+        <div class="label">UC acumuladas</div>
+        <div class="value" id="res-uc">0</div>
+      </div>
+      <div class="card-resumen">
+        <div class="label">Total de materias</div>
+        <div class="value" id="res-total">0</div>
+      </div>
+    </div>
+
+    <div class="grafico-container">
+      <h3>Progreso en UC</h3>
+      <canvas id="graficoUC" height="120"></canvas>
+    </div>
+
+    <div class="leyenda">
+      <div class="leyenda-item">
+        <div class="leyenda-color estado-aprobada"></div> <span>Aprobada</span>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-color estado-disponible"></div> <span>Disponible para cursar</span>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-color estado-bloqueada"></div> <span>Bloqueada por requisitos</span>
+      </div>
+      <div class="leyenda-item">
+        <div class="leyenda-color estado-no_aprobada"></div> <span>No aprobada (sin requisitos)</span>
+      </div>
+    </div>
+
+    <div class="lista-materias" id="lista-materias">
+      <!-- Aquí se pintan las materias con colores -->
+    </div>
+  </div>
 </div>
 
 <script>
-    let pensum = null;
+  let graficoUC = null;
+  let pensumCache = null;
 
-    async function cargarPensum() {
-        const res = await fetch("http://localhost:4567/api/v1/pensum");
-        const data = await res.json();
-        pensum = data.pensum;
-        mostrarMaterias();
+  // 1) Cargar el pensum desde la API y mostrar checkboxes
+  fetch("http://localhost:4567/api/v1/pensum")
+    .then(res => res.json())
+    .then(data => {
+      pensumCache = data.pensum;
+      const contenedor = document.getElementById("contenedor");
+
+      data.pensum.forEach((materia, index) => {
+        const div = document.createElement("div");
+        div.className = "materia";
+
+        const codigoVisible = materia.codigo_oficial && materia.codigo_oficial.trim() !== ""
+          ? materia.codigo_oficial
+          : materia.codigo_sistema;
+
+        div.innerHTML = `
+          <label>
+            <input type="checkbox" id="m${index}">
+            ${codigoVisible} - ${materia.nombre}
+          </label>
+        `;
+
+        contenedor.appendChild(div);
+      });
+    });
+
+  // 2) Enviar los estados a la API y construir el dashboard
+  function enviar() {
+    if (!pensumCache) return;
+
+    const estados = {};
+
+    pensumCache.forEach((materia, index) => {
+      const check = document.getElementById("m" + index);
+      const codigo = (materia.codigo_oficial && materia.codigo_oficial.trim() !== "")
+        ? materia.codigo_oficial
+        : materia.codigo_sistema;
+
+      estados[codigo] = check.checked ? "aprobada" : "no_aprobada";
+    });
+
+    const payload = {
+      estudiante_id: "12345",
+      estados: estados
+    };
+
+    fetch("http://localhost:4567/api/v1/evaluar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Error en la API: " + res.status);
+      }
+      return res.json();
+    })
+    .then(data => {
+      const div = document.getElementById("resultado");
+      div.style.display = "block";
+      div.style.background = "#e8ffe8";
+      div.style.border = "1px solid #00aa00";
+      div.innerHTML = "Evaluación realizada correctamente.";
+
+      construirDashboard(data.resultado);
+    })
+    .catch(error => {
+      const div = document.getElementById("resultado");
+      div.style.display = "block";
+      div.style.background = "#ffe8e8";
+      div.style.border = "1px solid #cc0000";
+      div.innerHTML = "Error: " + error.message;
+    });
+  }
+
+  // 3) Construir dashboard a partir del resultado de la API
+  function construirDashboard(resultado) {
+    const resumen = resultado.resumen;
+    const detalle = resultado.detalle;
+
+    // Resumen numérico
+    document.getElementById("res-aprobadas").textContent = resumen.aprobadas || 0;
+    document.getElementById("res-uc").textContent = resumen.uc_acumuladas || 0;
+    document.getElementById("res-total").textContent = resumen.total_materias || detalle.length;
+
+    // Cálculo de UC totales (para el gráfico)
+    const ucTotales = detalle.reduce((sum, m) => {
+      return sum + (m.uc ? parseInt(m.uc, 10) : 0);
+    }, 0);
+
+    const ucAprobadas = resumen.uc_acumuladas || 0;
+    const ucRestantes = Math.max(ucTotales - ucAprobadas, 0);
+
+    // Gráfico de progreso
+    const ctx = document.getElementById("graficoUC").getContext("2d");
+    if (graficoUC) {
+      graficoUC.destroy();
     }
+    graficoUC = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["UC aprobadas", "UC restantes"],
+        datasets: [{
+          data: [ucAprobadas, ucRestantes],
+          backgroundColor: ["#4caf50", "#cccccc"]
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
+    });
 
-    function mostrarMaterias() {
-        const cont = document.getElementById("contenedor-materias");
+    // Estados académicos por materia
+    const aprobadasCodigos = detalle
+      .filter(m => m.estado === "aprobada")
+      .map(m => m.codigo);
 
-        pensum.forEach(sem => {
-            const titulo = document.createElement("h2");
-            titulo.textContent = `Semestre ${sem.semestre}`;
-            cont.appendChild(titulo);
+    const lista = document.getElementById("lista-materias");
+    lista.innerHTML = "";
 
-            sem.materias.forEach(mat => {
-                const div = document.createElement("div");
-                div.className = "materia";
+    detalle.forEach(m => {
+      const reqs = m.requisitos || [];
+      let estadoAcademico = m.estado; // "aprobada" o "no_aprobada"
 
-                div.innerHTML = `
-                    <strong>${mat.codigo}</strong> - ${mat.nombre}<br>
-                    Estado:
-                    <select id="${mat.codigo}">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="aplazada">Aplazada</option>
-                    </select>
-                `;
+      if (m.estado !== "aprobada") {
+        if (reqs.length === 0) {
+          estadoAcademico = "no_aprobada"; // sin requisitos
+        } else if (reqs.every(r => aprobadasCodigos.includes(r))) {
+          estadoAcademico = "disponible";
+        } else {
+          estadoAcademico = "bloqueada";
+        }
+      }
 
-                cont.appendChild(div);
-            });
-        });
-    }
+      const card = document.createElement("div");
+      card.className = "card-materia estado-" + estadoAcademico;
 
-    async function evaluarPensum() {
-        const estados = {};
+      const requisitosTexto = reqs.length > 0
+        ? "Requisitos: " + reqs.join(", ")
+        : "Sin requisitos";
 
-        pensum.forEach(sem => {
-            sem.materias.forEach(mat => {
-                const valor = document.getElementById(mat.codigo).value;
-                estados[mat.codigo] = valor;
-            });
-        });
+      card.innerHTML = `
+        <div>
+          <span class="codigo">${m.codigo}</span>
+          <span>${m.nombre}</span>
+          <span class="semestre">[Semestre ${m.semestre}]</span>
+          <span class="estado-tag ${estadoAcademico}">${estadoAcademico.replace("_", " ")}</span>
+        </div>
+        <div class="requisitos">${requisitosTexto}</div>
+      `;
 
-        const payload = {
-            estudiante_id: "12345678",
-            estados: estados
-        };
-
-        const res = await fetch("http://localhost:4567/api/v1/evaluar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        mostrarResultado(data.resultado);
-    }
-
-    function mostrarResultado(resultado) {
-        const cont = document.getElementById("resultado");
-        cont.innerHTML = "<h2>Resultado del Motor Académico</h2>";
-
-        resultado.forEach(sem => {
-            const titulo = document.createElement("h3");
-            titulo.textContent = `Semestre ${sem.semestre}`;
-            cont.appendChild(titulo);
-
-            sem.materias.forEach(mat => {
-                const div = document.createElement("div");
-                div.className = "resultado-box";
-
-                div.innerHTML = `
-                    <strong>${mat.codigo}</strong> - ${mat.nombre}<br>
-                    Estado: <span class="estado">${mat.estado}</span>
-                `;
-
-                cont.appendChild(div);
-            });
-        });
-    }
-
-    cargarPensum();
+      lista.appendChild(card);
+    });
+  }
 </script>
 
 </body>
 </html>
+
+
