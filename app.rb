@@ -2,6 +2,9 @@ require "sinatra"
 require "json"
 require_relative "motor"
 
+require "webrick"
+set :server, "webrick"
+
 set :bind, "0.0.0.0"
 set :port, 4567
 
@@ -23,3 +26,10 @@ get "/api/v1/pensum" do
   content_type :json
   { pensum: PENSUM }.to_json
 end
+
+get "/" do
+  send_file "index.html"
+end
+
+
+
