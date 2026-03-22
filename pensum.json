@@ -3,7 +3,6 @@
     "semestre": 1,
     "codigo_oficial": "ADG-25132",
     "codigo_sistema": "SIS-0101",
-    "codigo": "SIS-0101",
     "nombre": "EDUCACIÓN AMBIENTAL",
     "uc": 2,
     "requisitos": []
@@ -12,7 +11,6 @@
     "semestre": 1,
     "codigo_oficial": "ADG-25123",
     "codigo_sistema": "SIS-0102",
-    "codigo": "SIS-0102",
     "nombre": "HOMBRE, SOCIEDAD, CIENCIA Y TECNOLOGÍA",
     "uc": 3,
     "requisitos": []
@@ -21,7 +19,6 @@
     "semestre": 1,
     "codigo_oficial": "IDM-24113",
     "codigo_sistema": "SIS-0103",
-    "codigo": "SIS-0103",
     "nombre": "INGLÉS I",
     "uc": 3,
     "requisitos": []
@@ -30,7 +27,6 @@
     "semestre": 1,
     "codigo_oficial": "MAT-21212",
     "codigo_sistema": "SIS-0104",
-    "codigo": "SIS-0104",
     "nombre": "DIBUJO",
     "uc": 2,
     "requisitos": []
@@ -39,25 +35,22 @@
     "semestre": 1,
     "codigo_oficial": "MAT-21215",
     "codigo_sistema": "SIS-0105",
-    "codigo": "SIS-0105",
     "nombre": "MATEMÁTICA I",
     "uc": 5,
-    "requisitos": ["MAT-21524"]
+    "requisitos": []
   },
   {
     "semestre": 1,
     "codigo_oficial": "MAT-21524",
     "codigo_sistema": "SIS-0106",
-    "codigo": "SIS-0106",
     "nombre": "GEOMETRÍA ANALÍTICA",
     "uc": 4,
-    "requisitos": ["MAT-21215"]
+    "requisitos": []
   },
   {
     "semestre": 1,
     "codigo_oficial": "ADG-25131",
     "codigo_sistema": "SIS-0107",
-    "codigo": "SIS-0107",
     "nombre": "SEMINARIO I",
     "uc": 1,
     "requisitos": []
@@ -66,17 +59,64 @@
     "semestre": 1,
     "codigo_oficial": "DIN-21113",
     "codigo_sistema": "SIS-0108",
-    "codigo": "SIS-0108",
     "nombre": "DEFENSA INTEGRAL DE LA NACIÓN I",
     "uc": 3,
     "requisitos": []
   },
 
   {
+    "semestre": 2,
+    "codigo_oficial": "IDM-24123",
+    "codigo_sistema": "SIS-0201",
+    "nombre": "INGLÉS II",
+    "uc": 3,
+    "requisitos": ["IDM-24113"]
+  },
+  {
+    "semestre": 2,
+    "codigo_oficial": "MAT-21225",
+    "codigo_sistema": "SIS-0202",
+    "nombre": "MATEMÁTICA II",
+    "uc": 5,
+    "requisitos": ["MAT-21215"]
+  },
+  {
+    "semestre": 2,
+    "codigo_oficial": "MAT-21114",
+    "codigo_sistema": "SIS-0203",
+    "nombre": "ÁLGEBRA LINEAL",
+    "uc": 4,
+    "requisitos": ["MAT-21215"]
+  },
+  {
+    "semestre": 2,
+    "codigo_oficial": "QUF-23015",
+    "codigo_sistema": "SIS-0204",
+    "nombre": "FÍSICA I",
+    "uc": 4,
+    "requisitos": ["MAT-21215"]
+  },
+  {
+    "semestre": 2,
+    "codigo_oficial": "SIS-0208",
+    "codigo_sistema": "SIS-0205",
+    "nombre": "DEPORTE I",
+    "uc": null,
+    "requisitos": []
+  },
+  {
+    "semestre": 2,
+    "codigo_oficial": "DIN-21123",
+    "codigo_sistema": "SIS-0206",
+    "nombre": "DEFENSA INTEGRAL DE LA NACIÓN II",
+    "uc": 3,
+    "requisitos": ["DIN-21113"]
+  },
+
+  {
     "semestre": 3,
     "codigo_oficial": "QUF-23025",
     "codigo_sistema": "SIS-0301",
-    "codigo": "SIS-0301",
     "nombre": "FÍSICA II",
     "uc": 5,
     "requisitos": ["QUF-23015", "MAT-21225"]
@@ -85,7 +125,6 @@
     "semestre": 3,
     "codigo_oficial": "MAT-21235",
     "codigo_sistema": "SIS-0302",
-    "codigo": "SIS-0302",
     "nombre": "MATEMÁTICA III",
     "uc": 5,
     "requisitos": ["MAT-21225"]
@@ -94,7 +133,6 @@
     "semestre": 3,
     "codigo_oficial": "MAT-21414",
     "codigo_sistema": "SIS-0303",
-    "codigo": "SIS-0303",
     "nombre": "PROBABILIDADES Y ESTADÍSTICA",
     "uc": 4,
     "requisitos": ["MAT-21225"]
@@ -103,7 +141,6 @@
     "semestre": 3,
     "codigo_oficial": "SYC-22113",
     "codigo_sistema": "SIS-0304",
-    "codigo": "SIS-0304",
     "nombre": "PROGRAMACIÓN",
     "uc": 3,
     "requisitos": ["MAT-21114"]
@@ -112,7 +149,6 @@
     "semestre": 3,
     "codigo_oficial": "AGG-22313",
     "codigo_sistema": "SIS-0305",
-    "codigo": "SIS-0305",
     "nombre": "SISTEMAS ADMINISTRATIVOS",
     "uc": 4,
     "requisitos": []
@@ -121,7 +157,6 @@
     "semestre": 3,
     "codigo_oficial": "DIN-21133",
     "codigo_sistema": "SIS-0306",
-    "codigo": "SIS-0306",
     "nombre": "DEFENSA INTEGRAL DE LA NACIÓN III",
     "uc": 3,
     "requisitos": ["DIN-21123"]
@@ -131,7 +166,6 @@
     "semestre": 4,
     "codigo_oficial": "SYC-32114",
     "codigo_sistema": "SIS-0401",
-    "codigo": "SIS-0401",
     "nombre": "TEORÍA DE LOS SISTEMAS",
     "uc": 4,
     "requisitos": []
@@ -140,7 +174,6 @@
     "semestre": 4,
     "codigo_oficial": "MAT-31714",
     "codigo_sistema": "SIS-0402",
-    "codigo": "SIS-0402",
     "nombre": "CÁLCULO NUMÉRICO",
     "uc": 4,
     "requisitos": ["MAT-21235"]
@@ -149,7 +182,6 @@
     "semestre": 4,
     "codigo_oficial": "MAT-31214",
     "codigo_sistema": "SIS-0403",
-    "codigo": "SIS-0403",
     "nombre": "LÓGICA MATEMÁTICA",
     "uc": 4,
     "requisitos": ["MAT-21114"]
@@ -158,7 +190,6 @@
     "semestre": 4,
     "codigo_oficial": "SYC-32225",
     "codigo_sistema": "SIS-0404",
-    "codigo": "SIS-0404",
     "nombre": "LENGUAJES DE PROGRAMACIÓN I",
     "uc": 5,
     "requisitos": ["SYC-22113"]
@@ -167,7 +198,6 @@
     "semestre": 4,
     "codigo_oficial": "SYC-32414",
     "codigo_sistema": "SIS-0405",
-    "codigo": "SIS-0405",
     "nombre": "PROCESAMIENTO DE DATOS",
     "uc": 4,
     "requisitos": ["SYC-22113"]
@@ -176,7 +206,6 @@
     "semestre": 4,
     "codigo_oficial": "AGL-30214",
     "codigo_sistema": "SIS-0406",
-    "codigo": "SIS-0406",
     "nombre": "SISTEMAS DE PRODUCCIÓN",
     "uc": 4,
     "requisitos": ["AGG-22313"]
@@ -185,16 +214,14 @@
     "semestre": 4,
     "codigo_oficial": "DIN-31143",
     "codigo_sistema": "SIS-0407",
-    "codigo": "SIS-0407",
     "nombre": "DEFENSA INTEGRAL DE LA NACIÓN IV",
     "uc": 3,
     "requisitos": ["DIN-21133"]
   },
   {
     "semestre": 4,
-    "codigo_oficial": "",
+    "codigo_oficial": "SIS-0408",
     "codigo_sistema": "SIS-0408",
-    "codigo": "SIS-0408",
     "nombre": "DEPORTE II",
     "uc": null,
     "requisitos": ["SIS-0208"]
@@ -202,258 +229,235 @@
 
   {
     "semestre": 5,
-    "codigo_oficial": "MAT-31114",
+    "codigo_oficial": "SYC-32325",
     "codigo_sistema": "SIS-0501",
-    "codigo": "SIS-0501",
-    "nombre": "TEORÍA DE GRAFOS",
-    "uc": 4,
-    "requisitos": ["MAT-31214", "MAT-21414"]
-  },
-  {
-    "semestre": 5,
-    "codigo_oficial": "SYC-32235",
-    "codigo_sistema": "SIS-0502",
-    "codigo": "SIS-0502",
     "nombre": "LENGUAJES DE PROGRAMACIÓN II",
     "uc": 5,
     "requisitos": ["SYC-32225"]
   },
   {
     "semestre": 5,
-    "codigo_oficial": "MAT-30925",
-    "codigo_sistema": "SIS-0503",
-    "codigo": "SIS-0503",
-    "nombre": "INVESTIGACIÓN DE OPERACIONES",
-    "uc": 5,
-    "requisitos": ["MAT-31714"]
-  },
-  {
-    "semestre": 5,
-    "codigo_oficial": "ELN-30514",
-    "codigo_sistema": "SIS-0504",
-    "codigo": "SIS-0504",
-    "nombre": "CIRCUITOS LÓGICOS",
-    "uc": 4,
-    "requisitos": ["MAT-31214"]
-  },
-  {
-    "semestre": 5,
     "codigo_oficial": "SYC-32514",
-    "codigo_sistema": "SIS-0505",
-    "codigo": "SIS-0505",
-    "nombre": "ANÁLISIS DE SISTEMAS",
-    "uc": 4,
-    "requisitos": ["SYC-32114"]
-  },
-  {
-    "semestre": 5,
-    "codigo_oficial": "SYC-32614",
-    "codigo_sistema": "SIS-0506",
-    "codigo": "SIS-0506",
-    "nombre": "BASES DE DATOS",
+    "codigo_sistema": "SIS-0502",
+    "nombre": "BASES DE DATOS I",
     "uc": 4,
     "requisitos": ["SYC-32414"]
   },
   {
     "semestre": 5,
+    "codigo_oficial": "SYC-32614",
+    "codigo_sistema": "SIS-0503",
+    "nombre": "ARQUITECTURA DEL COMPUTADOR",
+    "uc": 4,
+    "requisitos": ["SYC-22113"]
+  },
+  {
+    "semestre": 5,
+    "codigo_oficial": "MAT-31514",
+    "codigo_sistema": "SIS-0504",
+    "nombre": "INVESTIGACIÓN DE OPERACIONES I",
+    "uc": 4,
+    "requisitos": ["MAT-21235"]
+  },
+  {
+    "semestre": 5,
+    "codigo_oficial": "AGG-32514",
+    "codigo_sistema": "SIS-0505",
+    "nombre": "GESTIÓN DE RECURSOS HUMANOS",
+    "uc": 4,
+    "requisitos": ["AGG-22313"]
+  },
+  {
+    "semestre": 5,
     "codigo_oficial": "DIN-31153",
-    "codigo_sistema": "SIS-0507",
-    "codigo": "SIS-0507",
+    "codigo_sistema": "SIS-0506",
     "nombre": "DEFENSA INTEGRAL DE LA NACIÓN V",
     "uc": 3,
     "requisitos": ["DIN-31143"]
   },
-  {
-    "semestre": 5,
-    "codigo_oficial": "",
-    "codigo_sistema": "SIS-0508",
-    "codigo": "SIS-0508",
-    "nombre": "CÁTEDRA I",
-    "uc": null,
-    "requisitos": []
-  },
 
   {
     "semestre": 6,
-    "codigo_oficial": "MAT-30935",
+    "codigo_oficial": "SYC-42114",
     "codigo_sistema": "SIS-0601",
-    "codigo": "SIS-0601",
-    "nombre": "OPTIMIZACIÓN NO LINEAL",
-    "uc": 5,
-    "requisitos": ["MAT-30925"]
-  },
-  {
-    "semestre": 6,
-    "codigo_oficial": "SYC-32245",
-    "codigo_sistema": "SIS-0602",
-    "codigo": "SIS-0602",
-    "nombre": "LENGUAJES DE PROGRAMACIÓN III",
-    "uc": 5,
-    "requisitos": ["SYC-32235"]
-  },
-  {
-    "semestre": 6,
-    "codigo_oficial": "MAT-31414",
-    "codigo_sistema": "SIS-0603",
-    "codigo": "SIS-0603",
-    "nombre": "PROCESOS ESTOCÁSTICOS",
+    "nombre": "SISTEMAS OPERATIVOS",
     "uc": 4,
-    "requisitos": ["MAT-30925", "MAT-31114"]
+    "requisitos": ["SYC-32614"]
   },
   {
     "semestre": 6,
-    "codigo_oficial": "SYC-30525",
-    "codigo_sistema": "SIS-0604",
-    "codigo": "SIS-0604",
-    "nombre": "ARQUITECTURA DEL COMPUTADOR",
-    "uc": 5,
-    "requisitos": ["ELN-30514"]
+    "codigo_oficial": "SYC-42214",
+    "codigo_sistema": "SIS-0602",
+    "nombre": "REDES DE COMPUTADORAS I",
+    "uc": 4,
+    "requisitos": ["SYC-32614"]
   },
   {
     "semestre": 6,
-    "codigo_oficial": "SYC-32524",
-    "codigo_sistema": "SIS-0605",
-    "codigo": "SIS-0605",
-    "nombre": "DISEÑO DE SISTEMAS",
+    "codigo_oficial": "SYC-42314",
+    "codigo_sistema": "SIS-0603",
+    "nombre": "BASES DE DATOS II",
     "uc": 4,
     "requisitos": ["SYC-32514"]
   },
   {
     "semestre": 6,
-    "codigo_oficial": "SYC-30834",
-    "codigo_sistema": "SIS-0606",
-    "codigo": "SIS-0606",
-    "nombre": "SISTEMAS OPERATIVOS",
+    "codigo_oficial": "SYC-42414",
+    "codigo_sistema": "SIS-0604",
+    "nombre": "INGENIERÍA DE SOFTWARE I",
     "uc": 4,
-    "requisitos": ["SYC-30525"]
+    "requisitos": ["SYC-32225"]
   },
   {
     "semestre": 6,
-    "codigo_oficial": "DIN-31163",
-    "codigo_sistema": "SIS-0607",
-    "codigo": "SIS-0607",
+    "codigo_oficial": "MAT-31614",
+    "codigo_sistema": "SIS-0605",
+    "nombre": "INVESTIGACIÓN DE OPERACIONES II",
+    "uc": 4,
+    "requisitos": ["MAT-31514"]
+  },
+  {
+    "semestre": 6,
+    "codigo_oficial": "DIN-41163",
+    "codigo_sistema": "SIS-0606",
     "nombre": "DEFENSA INTEGRAL DE LA NACIÓN VI",
     "uc": 3,
     "requisitos": ["DIN-31153"]
   },
-  {
-    "semestre": 6,
-    "codigo_oficial": "",
-    "codigo_sistema": "SIS-0608",
-    "codigo": "SIS-0608",
-    "nombre": "CÁTEDRA II",
-    "uc": null,
-    "requisitos": ["SIS-0508"]
-  },
-  {
-    "semestre": 6,
-    "codigo_oficial": "",
-    "codigo_sistema": "SIS-0609",
-    "codigo": "SIS-0609",
-    "nombre": "CULTURA I",
-    "uc": null,
-    "requisitos": []
-  },
 
   {
     "semestre": 7,
-    "codigo_oficial": "SYC-32714",
+    "codigo_oficial": "SYC-52114",
     "codigo_sistema": "SIS-0701",
-    "codigo": "SIS-0701",
-    "nombre": "IMPLANTACIÓN DE SISTEMAS",
+    "nombre": "REDES DE COMPUTADORAS II",
     "uc": 4,
-    "requisitos": ["SYC-32524"]
+    "requisitos": ["SYC-42214"]
   },
   {
     "semestre": 7,
-    "codigo_oficial": "ADG-30214",
+    "codigo_oficial": "SYC-52214",
     "codigo_sistema": "SIS-0702",
-    "codigo": "SIS-0702",
-    "nombre": "METODOLOGÍA DE LA INVESTIGACIÓN",
+    "nombre": "INGENIERÍA DE SOFTWARE II",
     "uc": 4,
-    "requisitos": []
+    "requisitos": ["SYC-42414"]
   },
   {
     "semestre": 7,
-    "codigo_oficial": "MAT-30945",
+    "codigo_oficial": "SYC-52314",
     "codigo_sistema": "SIS-0703",
-    "codigo": "SIS-0703",
-    "nombre": "SIMULACIÓN Y MODELOS",
-    "uc": 5,
-    "requisitos": ["MAT-30935", "MAT-31414"]
+    "nombre": "SISTEMAS DE INFORMACIÓN GERENCIAL",
+    "uc": 4,
+    "requisitos": ["AGG-32514"]
   },
   {
     "semestre": 7,
-    "codigo_oficial": "SYC-31644",
+    "codigo_oficial": "SYC-52414",
     "codigo_sistema": "SIS-0704",
-    "codigo": "SIS-0704",
-    "nombre": "REDES",
-    "uc": 4,
-    "requisitos": ["SYC-30834"]
-  },
-  {
-    "semestre": 7,
-    "codigo_oficial": "ADG-30224",
-    "codigo_sistema": "SIS-0705",
-    "codigo": "SIS-0705",
-    "nombre": "GERENCIA DE LA INFORMÁTICA",
-    "uc": 4,
-    "requisitos": []
-  },
-  {
-    "semestre": 7,
-    "codigo_oficial": "",
-    "codigo_sistema": "SIS-ET01",
-    "codigo": "SIS-ET01",
-    "nombre": "ELECTIVA TÉCNICA I",
-    "uc": 3,
-    "requisitos": []
-  },
-  {
-    "semestre": 7,
-    "codigo_oficial": "",
-    "codigo_sistema": "SIS-EN01",
-    "codigo": "SIS-EN01",
-    "nombre": "ELECTIVA NO TÉCNICA I",
-    "uc": 3,
-    "requisitos": []
-  },
-  {
-    "semestre": 7,
-    "codigo_oficial": "DIN-31173",
-    "codigo_sistema": "SIS-0706",
-    "codigo": "SIS-0706",
-    "nombre": "DEFENSA INTEGRAL DE LA NACIÓN VII",
-    "uc": 3,
-    "requisitos": ["DIN-31163"]
-  },
-
-  {
-    "semestre": 8,
-    "codigo_oficial": "MAT-31314",
-    "codigo_sistema": "SIS-0801",
-    "codigo": "SIS-0801",
-    "nombre": "TEORÍA DE DECISIONES",
-    "uc": 4,
-    "requisitos": ["MAT-30945"]
-  },
-  {
-    "semestre": 8,
-    "codigo_oficial": "SYC-32814",
-    "codigo_sistema": "SIS-0802",
-    "codigo": "SIS-0802",
     "nombre": "AUDITORÍA DE SISTEMAS",
     "uc": 4,
-    "requisitos": ["SYC-32714"]
+    "requisitos": ["SYC-32514"]
   },
   {
-    "semestre": 8,
-    "codigo_oficial": "CJU-37314",
-    "codigo_sistema": "SIS-0803",
-    "codigo": "SIS-0803",
-    "nombre": "MARCO LEGAL PARA EL EJERCICIO DE LA INGENIERÍA",
+    "semestre": 7,
+    "codigo_oficial": "SYC-52514",
+    "codigo_sistema": "SIS-0705",
+    "nombre": "ELECTIVA I",
     "uc": 4,
     "requisitos": []
   },
   {
-    "semestre": 
+    "semestre": 7,
+    "codigo_oficial": "DIN-51173",
+    "codigo_sistema": "SIS-0706",
+    "nombre": "DEFENSA INTEGRAL DE LA NACIÓN VII",
+    "uc": 3,
+    "requisitos": ["DIN-41163"]
+  },
+
+  {
+    "semestre": 8,
+    "codigo_oficial": "SYC-62114",
+    "codigo_sistema": "SIS-0801",
+    "nombre": "REDES DE COMPUTADORAS III",
+    "uc": 4,
+    "requisitos": ["SYC-52114"]
+  },
+  {
+    "semestre": 8,
+    "codigo_oficial": "SYC-62214",
+    "codigo_sistema": "SIS-0802",
+    "nombre": "SEGURIDAD INFORMÁTICA",
+    "uc": 4,
+    "requisitos": ["SYC-52114"]
+  },
+  {
+    "semestre": 8,
+    "codigo_oficial": "SYC-62314",
+    "codigo_sistema": "SIS-0803",
+    "nombre": "INGENIERÍA DE SOFTWARE III",
+    "uc": 4,
+    "requisitos": ["SYC-52214"]
+  },
+  {
+    "semestre": 8,
+    "codigo_oficial": "SYC-62414",
+    "codigo_sistema": "SIS-0804",
+    "nombre": "PROYECTO I",
+    "uc": 4,
+    "requisitos": ["SYC-52214", "SYC-52314"]
+  },
+  {
+    "semestre": 8,
+    "codigo_oficial": "SYC-62514",
+    "codigo_sistema": "SIS-0805",
+    "nombre": "ELECTIVA II",
+    "uc": 4,
+    "requisitos": ["SYC-52514"]
+  },
+  {
+    "semestre": 8,
+    "codigo_oficial": "DIN-61183",
+    "codigo_sistema": "SIS-0806",
+    "nombre": "DEFENSA INTEGRAL DE LA NACIÓN VIII",
+    "uc": 3,
+    "requisitos": ["DIN-51173"]
+  },
+
+  {
+    "semestre": 9,
+    "codigo_oficial": "SYC-72114",
+    "codigo_sistema": "SIS-0901",
+    "nombre": "PROYECTO II",
+    "uc": 4,
+    "requisitos": ["SYC-62414"]
+  },
+  {
+    "semestre": 9,
+    "codigo_oficial": "SYC-72214",
+    "codigo_sistema": "SIS-0902",
+    "nombre": "ELECTIVA III",
+    "uc": 4,
+    "requisitos": ["SYC-62514"]
+  },
+  {
+    "semestre": 9,
+    "codigo_oficial": "SYC-72330",
+    "codigo_sistema": "SIS-0903",
+    "nombre": "PASANTÍA",
+    "uc": 0,
+    "requisitos": [
+      "SYC-62114",
+      "SYC-62214",
+      "SYC-62314",
+      "SYC-62414"
+    ]
+  },
+  {
+    "semestre": 9,
+    "codigo_oficial": "DIN-71193",
+    "codigo_sistema": "SIS-0904",
+    "nombre": "DEFENSA INTEGRAL DE LA NACIÓN IX",
+    "uc": 3,
+    "requisitos": ["DIN-61183"]
+  }
+]
