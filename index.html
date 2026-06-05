@@ -215,13 +215,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .next-sem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .next-sem-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .next-sem-col h4.can{color:var(--green);}
-.next-sem-col h4.cant{color:var(--red);}
+.next-sem-col h4.cant{color:var(--orange);}
 .next-mat-item{
   padding:8px 10px;border-radius:7px;font-size:11px;border:1px solid;
   margin-bottom:4px;display:flex;align-items:flex-start;gap:7px;
 }
 .next-mat-item.can{background:rgba(34,211,165,.05);border-color:rgba(34,211,165,.2);}
-.next-mat-item.cant{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.2);}
+.next-mat-item.cant{background:rgba(251,146,60,.05);border-color:rgba(251,146,60,.35);}
 .nmi-name{flex:1;font-weight:600;line-height:1.3;}
 .nmi-detail{font-size:10px;color:var(--text2);margin-top:2px;font-family:var(--mono);}
 .nmi-falt{font-size:10px;color:var(--red);margin-top:2px;}
@@ -320,18 +320,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .t-msg small{font-size:11px;color:var(--text2);}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-@media(max-width:900px){
-  .stats-bar{grid-template-columns:repeat(3,1fr);}
-  .dash-grid{grid-template-columns:1fr 1fr;}
-  .next-sem-grid{grid-template-columns:1fr;}
-  .student-form{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:600px){
-  .sidebar{width:100%;min-width:0;}
-  #view-pensum{flex-direction:column;}
-  .detail{display:none;}
-  .student-form{grid-template-columns:1fr;}
-
+/* RESPONSIVE LAYOUTS GENERALES */
 @media(max-width:900px){
   .stats-bar{grid-template-columns:repeat(3,1fr);}
   .dash-grid{grid-template-columns:1fr 1fr;}
@@ -339,36 +328,57 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   .student-form{grid-template-columns:1fr 1fr;}
 }
 
-@media(max-width:768px){
-
-  .header{
-    padding:10px;
+@media(max-width:768px) {
+  /* Arreglo clave para colapsar en móviles de forma limpia */
+  .app {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
   }
-
-  .tabs{
-    overflow-x:auto;
-    white-space:nowrap;
+  .header {
+    padding: 10px;
+    flex-direction: column;
+    text-align: center;
   }
-
-  .stats-bar{
-    grid-template-columns:repeat(2,1fr);
+  .tabs {
+    overflow-x: auto;
+    white-space: nowrap;
   }
-
+  .stats-bar {
+    grid-template-columns: repeat(2,1fr);
+  }
+  #view-pensum {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-height: 380px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  /* Forzamos visualización del bloque inferior de detalle */
+  .detail {
+    display: block !important;
+    width: 100% !important;
+    padding: 15px !important;
+  }
+  #select-intento {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
 }
 
 @media(max-width:600px){
-  .sidebar{width:100%;min-width:0;}
-  #view-pensum{flex-direction:column;}
-  .detail{display:none;}
   .student-form{grid-template-columns:1fr;}
-}
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- HEADER -->
 <header class="header">
   <div class="logo">
     <div class="logo-icon">🎓</div>
@@ -383,14 +393,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </header>
 
-<!-- TABS -->
 <nav class="tabs">
   <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg-pensum">0</span></div>
   <div class="tab" onclick="setTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
   <div class="tab" onclick="setTab('mapa')" id="tab-mapa">🗺 Mapa Visual</div>
 </nav>
 
-<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-val c-green" id="st-ap">0</div><div class="stat-label">Aprobadas</div></div>
   <div class="stat"><div class="stat-val c-blue" id="st-disp">0</div><div class="stat-label">Disponibles</div></div>
@@ -400,7 +408,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="stat"><div class="stat-val c-gray" id="st-falta">224</div><div class="stat-label">UC Faltan</div></div>
 </div>
 
-<!-- VIEW: PENSUM -->
 <div class="view active" id="view-pensum">
   <div class="sidebar">
     <div class="sb-head">
@@ -416,10 +423,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
-<!-- VIEW: DASHBOARD -->
 <div class="view" id="view-dashboard">
 
-  <!-- Student Info -->
   <div class="student-form" id="student-form">
     <div class="form-field"><label>Nombre y Apellido</label><input id="f-nombre" placeholder="Ej: Juan Pérez" oninput="saveStudent()"></div>
     <div class="form-field"><label>Cédula de Identidad</label><input id="f-cedula" placeholder="Ej: V-12345678" oninput="saveStudent()"></div>
@@ -427,7 +432,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div><button class="btn excel" style="width:100%" onclick="exportExcel()">📊 Exportar Reporte Excel</button></div>
   </div>
 
-  <!-- Progreso General -->
   <div class="dcard">
     <h3><span class="ico">🎯</span> Progreso Académico General</h3>
     <div class="ring-wrap">
@@ -458,7 +462,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     </div>
   </div>
 
-  <!-- Progress por semestre -->
   <div class="dcard">
     <h3><span class="ico">📈</span> UC Aprobadas por Semestre</h3>
     <div class="chart-bars" id="chart-bars"></div>
@@ -468,27 +471,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     </div>
   </div>
 
-  <!-- Barras de progreso por semestre -->
   <div class="dcard">
     <h3><span class="ico">📊</span> Avance por Semestre</h3>
     <div id="sem-bars"></div>
   </div>
 
-  <!-- Próximo semestre -->
   <div class="dcard">
-    <h3><span class="ico">🔮</span> Próximo Semestre — Materias disponibles vs bloqueadas</h3>
+    <h3><span class="ico">🔮</span> Próximo Semestre — Materias sugeridas para Inscripción</h3>
     <div class="next-sem-grid" id="next-sem-grid"></div>
   </div>
 
 </div>
 
-<!-- VIEW: MAPA -->
 <div class="view" id="view-mapa">
   <div class="pensum-grid" id="pensum-grid"></div>
 </div>
 
-</div><!-- /app -->
-<div class="toast-container" id="toast-wrap"></div>
+</div><div class="toast-container" id="toast-wrap"></div>
 
 <script>
 // ════════════════════════════════════════════
@@ -588,7 +587,7 @@ MATERIAS.forEach(m => mMap[m.id] = m);
 // ════════════════════════════════════════════
 let aprobadas = new Set(JSON.parse(localStorage.getItem('unefa2_ap')||'[]'));
 let student = JSON.parse(localStorage.getItem('unefa2_student')||'{"nombre":"","cedula":"","seccion":""}');
-let historialMaterias = JSON.parse(localStorage.getItem('unefa2_historial') || '{}');
+let historialMaterias = JSON.parse(localStorage.getItem('unefa2_historial_intentos') || '{}');
 let selId = null;
 let filterSem = 0;
 let currentTab = 'pensum';
@@ -644,455 +643,356 @@ function toggleMateria(id){
     const msg = desbloq.length ? `Desbloqueaste: ${desbloq.map(d=>d.nombre).join(', ')}` : '';
     toast('ok',`✓ Aprobada: ${mMap[id].nombre} (${mMap[id].uc} UC)`,msg);
   }
-  save(); render();
-  if(selId) showDetail(selId);
-}
-
-function save(){ localStorage.setItem('unefa2_ap', JSON.stringify([...aprobadas])); }
-
-function resetAll(){
-  if(!confirm('¿Eliminar todo el progreso?')) return;
-  aprobadas.clear(); historialMaterias = {}; save();
-  localStorage.setItem('unefa2_historial', '{}'); selId=null;
-  document.getElementById('d-empty').style.display='flex';
-  document.getElementById('d-content').style.display='none';
-  render();
-  toast('ok','Progreso reiniciado','');
-}
-
-function cambiarHistorialMateria(id, estado) {
-  if (estado === 'nueva') {
-    delete historialMaterias[id];
-  } else {
-    historialMaterias[id] = estado;
-  }
-  localStorage.setItem('unefa2_historial', JSON.stringify(historialMaterias));
+  save(); 
   render();
   if(selId === id) showDetail(id);
 }
 
-function aprobarSemestreCompleto(semestre) {
-  const materiasDelSemestre = MATERIAS.filter(m => m.sem === semestre);
-  let modificoAlgo = false;
+// FUNCIONES DE CONTROL DE INTENTOS / REPITENCIAS
+function cambiarIntentoMateria(id, valorIntento) {
+  if (!historialMaterias[id]) {
+    historialMaterias[id] = {};
+  }
+  historialMaterias[id].condicion = valorIntento;
+  localStorage.setItem('unefa2_historial_intentos', JSON.stringify(historialMaterias));
+  
+  render();
+  if (selId === id) showDetail(id);
 
-  materiasDelSemestre.forEach(m => {
-    if (aprobadas.has(m.id)) return;
-    const puedeAprobar = m.prereqs.every(p => aprobadas.has(p));
-
-    if (puedeAprobar) {
-      aprobadas.add(m.id);
-      modificoAlgo = true;
-    } else {
-      toast('err', `No se pudo marcar: ${m.nombre}`, `Faltan prelaciones de semestres anteriores.`);
-    }
-  });
-
-  if (modificoAlgo) {
-    save(); render();
-    toast('ok', `¡Semestre ${semestre} completado!`, `Se marcaron las materias que tenías disponibles.`);
+  if (valorIntento === '3') {
+    toast('err', '🚨 ALERTA DE PERMANENCIA', 'Asignatura en condición de 3er Intento (Última Oportunidad).');
   }
 }
 
-// ════════════════════════════════════════════
-// RENDER
-// ════════════════════════════════════════════
-function render(){
-  renderStats();
-  if(currentTab=='pensum') renderList();
-  if(currentTab=='dashboard') renderDashboard();
-  if(currentTab=='mapa') renderMapa();
+function save(){ 
+  localStorage.setItem('unefa2_ap', JSON.stringify([...aprobadas]));
 }
 
-function renderStats(){
-  const apCount = aprobadas.size;
-  let dispCount = 0; let bloqCount = 0; let nApCount = 0;
+// UI GENERAL RENDER
+function render(){
+  // Contadores Superiores
+  let cAp = aprobadas.size;
+  let cDisp = 0, cBloq = 0, cNap = 0;
   
   MATERIAS.forEach(m => {
-    const est = getEstado(m.id);
-    if(est === 'disponible' && !aprobadas.has(m.id)) dispCount++;
-    if(est === 'bloqueada') bloqCount++;
-    if(historialMaterias[m.id] && historialMaterias[m.id].startsWith('repite_') && !aprobadas.has(m.id)) nApCount++;
+    let e = getEstado(m.id);
+    if(e === 'disponible') cDisp++;
+    if(e === 'bloqueada') cBloq++;
   });
 
-  const uca = ucAp();
-  const ucf = Math.max(0, TOTAL_UC - uca);
+  document.getElementById('st-ap').innerText = cAp;
+  document.getElementById('st-disp').innerText = cDisp;
+  document.getElementById('st-bloq').innerText = cBloq;
+  document.getElementById('st-nap').innerText = cNap;
+  
+  let ucap = ucAp();
+  document.getElementById('st-uc').innerText = ucap;
+  document.getElementById('st-falta').innerText = TOTAL_UC - ucap;
+  document.getElementById('tbdg-pensum').innerText = MATERIAS.length;
 
-  document.getElementById('st-ap').innerText = apCount;
-  document.getElementById('st-disp').innerText = dispCount;
-  document.getElementById('st-bloq').innerText = bloqCount;
-  document.getElementById('st-nap').innerText = nApCount;
-  document.getElementById('st-uc').innerText = uca;
-  document.getElementById('st-falta').innerText = ucf;
-  document.getElementById('tbdg-pensum').innerText = apCount;
+  renderList();
+  renderDashboard();
+  renderMapa();
 }
 
 function renderList(){
-  const query = document.getElementById('s-search').value.toLowerCase();
-  const container = document.getElementById('mat-list');
-  container.innerHTML = '';
+  const list = document.getElementById('mat-list');
+  if(!list) return;
+  const q = document.getElementById('s-search').value.toLowerCase();
+  
+  let html = '';
+  MATERIAS.forEach(m => {
+    if(filterSem !== 0 && m.sem !== filterSem) return;
+    if(q && !m.nombre.toLowerCase().includes(q) && !m.id.toLowerCase().includes(q)) return;
+    
+    let st = getEstado(m.id);
+    let sel = (selId === m.id) ? 'sel' : '';
+    let checked = aprobadas.has(m.id) ? '✓' : '';
 
-  const filtradas = MATERIAS.filter(m => {
-    const cumpleFiltro = filterSem === 0 || m.sem === filterSem;
-    const cumpleBusqueda = m.nombre.toLowerCase().includes(query) || m.id.toLowerCase().includes(query);
-    return cumpleFiltro && cumpleBusqueda;
-  });
-
-  filtradas.forEach(m => {
-    const est = getEstado(m.id);
-    const item = document.createElement('div');
-    item.className = `mat-item st-${est} ${selId === m.id ? 'sel' : ''}`;
-    item.onclick = () => { selId = m.id; renderList(); showDetail(m.id); };
-
-    item.innerHTML = `
-      <div class="mat-cb" onclick="event.stopPropagation(); toggleMateria('${m.id}')">
-        ${est === 'aprobada' ? '✓' : ''}
-      </div>
-      <div class="mat-info">
-        <div class="mat-code">${m.id}</div>
-        <div class="mat-name">${m.nombre}</div>
-        <div class="mat-meta">
-          <span class="bdg bdg-uc">${m.uc} UC</span>
-          <span class="bdg bdg-sem">S${m.sem}</span>
-          <span class="bdg bdg-${est}">${est.toUpperCase().replace('_',' ')}</span>
+    html += `
+      <div class="mat-item st-${st} ${sel}" onclick="showDetail('${m.id}')">
+        <div class="mat-cb" onclick="event.stopPropagation(); toggleMateria('${m.id}')">${checked}</div>
+        <div class="mat-info">
+          <div class="mat-code">${m.id}</div>
+          <div class="mat-name">${m.nombre}</div>
+          <div class="mat-meta">
+            <span class="bdg bdg-uc">${m.uc} UC</span>
+            <span class="bdg bdg-sem">Sem ${m.sem}</span>
+            <span class="bdg bdg-${st}">${st.toUpperCase()}</span>
+          </div>
         </div>
       </div>
     `;
-    container.appendChild(item);
   });
+  list.innerHTML = html;
 }
 
 function showDetail(id){
-  document.getElementById('d-empty').style.display = 'none';
-  const c = document.getElementById('d-content');
-  c.style.display = 'block';
+  selId = id;
+  document.querySelectorAll('.mat-item').forEach(el => el.classList.remove('sel'));
+  
   const m = mMap[id];
-  const est = getEstado(id);
+  const st = getEstado(id);
+  const dEmpty = document.getElementById('d-empty');
+  const dContent = document.getElementById('d-content');
 
-  let alertHtml = '';
-  if(est === 'bloqueada'){
-    const f = getFaltantes(id);
-    alertHtml = `
-      <div class="alert alert-blocked">
-        <span class="alert-ico">🔒</span>
-        <div><strong>Materia Bloqueada:</strong> Requiere aprobar primero: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}.</div>
-      </div>`;
-  } else if(est === 'aprobada') {
-    alertHtml = `<div class="alert alert-approved"><span class="alert-ico">✓</span> Asignatura aprobada y consolidada.</div>`;
-  } else {
-    alertHtml = `<div class="alert alert-ok"><span class="alert-ico">✨</span> Disponible para cursar este período académico.</div>`;
+  if(dEmpty) dEmpty.style.display = 'none';
+  if(dContent) dContent.style.display = 'block';
+
+  const condicionActual = (historialMaterias[id] && historialMaterias[id].condicion) || '0';
+
+  let preHtml = '';
+  m.prereqs.forEach(pid => {
+    const pm = mMap[pid];
+    const pst = getEstado(pid);
+    preHtml += `
+      <div class="pre-item" onclick="showDetail('${pm.id}')">
+        <div class="pre-dot ${pst}"></div>
+        <div class="pre-name">${pm.nombre}</div>
+        <div class="pre-code">${pm.id}</div>
+      </div>
+    `;
+  });
+
+  let alertBox = '';
+  if(st === 'bloqueada') {
+    alertBox = `<div class="alert alert-blocked"><span class="alert-ico">🔒</span> Prelaciones pendientes. No habilitada en sistema.</div>`;
+  } else if(st === 'disponible') {
+    alertBox = `<div class="alert alert-ok"><span class="alert-ico">✨</span> Lista para ofertar e inscribir.</div>`;
+  } else if(st === 'aprobada') {
+    alertBox = `<div class="alert alert-approved"><span class="alert-ico">✓</span> Asignatura aprobada de forma regular.</div>`;
   }
 
-  c.innerHTML = `
+  dContent.innerHTML = `
     <div class="d-card">
       <div class="d-code">${m.id}</div>
-      <h2 class="d-title">${m.nombre}</h2>
+      <div class="d-title">${m.nombre}</div>
       <div class="d-badges">
         <span class="d-bdg uc">${m.uc} UC</span>
         <span class="d-bdg sem">Semestre ${m.sem}</span>
-        <span class="d-bdg ${est}">${est.toUpperCase().replace('_',' ')}</span>
+        <span class="d-bdg ${st}">${st.toUpperCase()}</span>
       </div>
-      ${alertHtml}
-      <button class="btn ${est==='aprobada'?'danger':'success'}" style="width:100%; margin-top:10px;" onclick="toggleMateria('${m.id}')">
-        ${est==='aprobada'?'❌ Desmarcar como Aprobada':'✓ Marcar como Aprobada'}
+      
+      <button class="btn success" style="width:100%; justify-content:center; margin-bottom:15px; font-weight:700;" onclick="toggleMateria('${m.id}')">
+        ${aprobadas.has(m.id) ? '✕ Desmarcar Aprobación' : '✓ Marcar como Aprobada'}
       </button>
 
-      ${est !== 'aprobada' ? `
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
-          <label style="font-size: 10px; color: var(--text2); display: block; margin-bottom: 5px; font-weight: 700; text-transform:uppercase;">
-            Condición de la Asignatura:
-          </label>
-          <select onchange="cambiarHistorialMateria('${id}', this.value)" 
-                  style="width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:8px; border-radius:6px; font-family:var(--font); font-size:12px; outline:none; cursor:pointer;">
-            <option value="nueva" ${((historialMaterias[id]||'nueva') === 'nueva') ? 'selected' : ''}>🆕 Nueva / Nunca inscrita</option>
-            <option value="repite_1" ${(historialMaterias[id] === 'repite_1') ? 'selected' : ''}>⚠️ Repitiendo (1er Intento)</option>
-            <option value="repite_2" ${(historialMaterias[id] === 'repite_2') ? 'selected' : ''}>⚠️ Repitiendo (2do Intento)</option>
-            <option value="repite_3" ${(historialMaterias[id] === 'repite_3') ? 'selected' : ''}>🚨 Última Oportunidad (3er Intento)</option>
+      <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:12px;">
+        <div class="sec-title">CONDICIÓN DE LA ASIGNATURA:</div>
+        <div class="form-field">
+          <select id="select-intento" onchange="cambiarIntentoMateria('${m.id}', this.value)" style="width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); font-family:var(--font); font-size:13px; outline:none; cursor:pointer;">
+            <option value="0" ${condicionActual === '0' ? 'selected' : ''}>🔹 Nueva / Nunca inscrita</option>
+            <option value="1" ${condicionActual === '1' ? 'selected' : ''}>⚠️ Repitiendo (1er Intento)</option>
+            <option value="2" ${condicionActual === '2' ? 'selected' : ''}>⚠️ Repitiendo (2do Intento)</option>
+            <option value="3" ${condicionActual === '3' ? 'selected' : ''}>🚨 Última Oportunidad (3er Intento)</option>
           </select>
         </div>
-      ` : ''}
+      </div>
     </div>
-    
-    <div class="sec-title">Prelaciones / Prerrequisitos</div>
-    <div class="pre-list">
-      ${m.prereqs.length === 0 ? '<p style="font-size:12px; color:var(--text3)">Esta materia no posee prelaciones.</p>' : 
-        m.prereqs.map(p => {
-          const pe = getEstado(p);
-          return `
-            <div class="pre-item" onclick="selId='${p}'; renderList(); showDetail('${p}')">
-              <div class="pre-dot ${pe}"></div>
-              <div class="pre-name">${mMap[p]?.nombre || p}</div>
-              <div class="pre-code">${p}</div>
-            </div>`;
-        }).join('')}
-    </div>
+    ${alertBox}
+    <div class="sec-title" style="margin-top:15px;">Prelaciones Obligatorias (${m.prereqs.length})</div>
+    <div class="pre-list">${preHtml || '<p style="font-size:11px; color:var(--text3)">Ninguna</p>'}</div>
   `;
+
+  renderList();
 }
 
 function renderDashboard(){
-  document.getElementById('f-nombre').value = student.nombre || '';
-  document.getElementById('f-cedula').value = student.cedula || '';
-  document.getElementById('f-seccion').value = student.seccion || '';
+  // Ring de progreso
+  let ucap = ucAp();
+  let pct = Math.round((ucap / TOTAL_UC) * 100) || 0;
+  document.getElementById('ring-pct').innerText = pct + '%';
+  
+  let circle = document.getElementById('ring-circle');
+  if(circle){
+    let totalCirc = 2 * Math.PI * 55; 
+    let strokeDash = totalCirc - (pct / 100) * totalCirc;
+    circle.style.strokeDashoffset = strokeDash;
+  }
 
-  const uca = ucAp();
-  const pct = TOTAL_UC > 0 ? Math.round((uca / TOTAL_UC) * 100) : 0;
-  
-  document.getElementById('ring-pct').innerText = `${pct}%`;
-  const offset = 345.4 - (345.4 * pct) / 100;
-  document.getElementById('ring-circle').style.strokeDashoffset = offset;
-
-  document.getElementById('rs-ap').innerText = `${uca} / ${TOTAL_UC}`;
-  
-  let ucd = 0; let ucb = 0;
-  MATERIAS.forEach(m => {
-    const est = getEstado(m.id);
-    if(est==='disponible' && !aprobadas.has(m.id)) ucd += m.uc;
-    if(est==='bloqueada') ucb += m.uc;
-  });
-  
-  document.getElementById('rs-disp').innerText = `${ucd} UC`;
-  document.getElementById('rs-bloq').innerText = `${ucb} UC`;
-  document.getElementById('rs-falt').innerText = `${Math.max(0, TOTAL_UC - uca)} UC`;
+  document.getElementById('rs-ap').innerText = `${ucap} / ${TOTAL_UC}`;
+  document.getElementById('rs-falt').innerText = TOTAL_UC - ucap;
   document.getElementById('rs-sem').innerText = `${semsCompletados()} / 9`;
 
-  renderCharts();
-  actualizarSeccionProximoSemestre();
-}
+  // Cálculos Próximo Semestre (Dividido en columnas)
+  const nextGrid = document.getElementById('next-sem-grid');
+  if(nextGrid){
+    let ucInscritas = 0;
+    let regulares = [];
+    let repitencias = [];
 
-function renderCharts(){
-  const barsContainer = document.getElementById('chart-bars');
-  const listContainer = document.getElementById('sem-bars');
-  barsContainer.innerHTML = ''; listContainer.innerHTML = '';
-
-  const semTotales = [1,2,3,4,5,6,7,8,9];
-
-  semTotales.forEach(s => {
-    const mats = MATERIAS.filter(m => m.sem === s);
-    const totalUC = mats.reduce((acc, m) => acc + m.uc, 0);
-    const aprobUC = mats.filter(m => aprobadas.has(m.id)).reduce((acc, m) => acc + m.uc, 0);
-    const pct = totalUC > 0 ? Math.round((aprobUC / totalUC) * 100) : 0;
-
-    const barWrap = document.createElement('div');
-    barWrap.className = 'chart-bar-wrap';
-    barWrap.innerHTML = `
-      <div class="chart-bar-val">${aprobUC}</div>
-      <div class="chart-bar" title="Semestre ${s}: ${aprobUC}/${totalUC} UC">
-        <div class="fill-aprobada" style="height:${pct}%"></div>
-      </div>
-      <div class="chart-bar-label">S${s}</div>
-    `;
-    barsContainer.appendChild(barWrap);
-
-    const progWrap = document.createElement('div');
-    progWrap.className = 'prog-bar-wrap';
-    progWrap.innerHTML = `
-      <div class="prog-bar-label">
-        <span>Semestre ${s}</span>
-        <span>${aprobUC} / ${totalUC} UC (${pct}%)</span>
-      </div>
-      <div class="prog-track">
-        <div class="prog-fill" style="width: ${pct}%; background: ${pct===100?'var(--green)':'var(--accent)'}"></div>
-      </div>
-    `;
-    listContainer.appendChild(progWrap);
-  });
-}
-
-function renderMapa(){
-  const container = document.getElementById('pensum-grid');
-  container.innerHTML = '';
-  const semTotales = [1,2,3,4,5,6,7,8,9];
-  
-  semTotales.forEach(s => {
-    const col = document.createElement('div');
-    col.className = 'sem-col';
-    const mats = MATERIAS.filter(m => m.sem === s);
-    const totalUC = mats.reduce((acc, m) => acc + m.uc, 0);
-    
-    col.innerHTML = `
-      <div class="sem-col-head">SEMESTRE ${s}</div>
-      <div class="sem-col-body" id="sem-body-${s}"></div>
-      <div class="sem-uc">${totalUC} UC Total</div>
-    `;
-    container.appendChild(col);
-    
-    const body = document.getElementById(`sem-body-${s}`);
-    mats.forEach(m => {
-      const est = getEstado(m.id);
-      const gm = document.createElement('div');
-      gm.className = `gm ${est} ${selId === m.id ? 'hl' : ''}`;
-      gm.onclick = () => { selId = m.id; setTab('pensum'); showDetail(m.id); };
-      
-      gm.innerHTML = `
-        <div class="gm-ind"></div>
-        <div class="gm-code">${m.id}</div>
-        <div class="gm-name">${m.nombre}</div>
-        <div class="gm-uc">${m.uc} UC</div>
-      `;
-      body.appendChild(gm);
-    });
-  });
-}
-
-function setTab(tabId){
-  currentTab = tabId;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  
-  document.getElementById(`tab-${tabId}`).classList.add('active');
-  document.getElementById(`view-${tabId}`).classList.add('active');
-  render();
-}
-
-function renderFilters(){
-  const container = document.getElementById('sb-filters');
-  container.innerHTML = '';
-  
-  const botones = [
-    {val: 0, text: 'TODOS'},
-    {val: 1, text: 'S1'}, {val: 2, text: 'S2'}, {val: 3, text: 'S3'},
-    {val: 4, text: 'S4'}, {val: 5, text: 'S5'}, {val: 6, text: 'S6'},
-    {val: 7, text: 'S7'}, {val: 8, text: 'S8'}, {val: 9, text: 'S9'}
-  ];
-  
-  botones.forEach(b => {
-    const btn = document.createElement('div');
-    btn.className = `f-btn ${filterSem === b.val ? 'active' : ''}`;
-    btn.innerText = b.text;
-    btn.onclick = () => { filterSem = b.val; renderFilters(); renderList(); };
-    container.appendChild(btn);
-  });
-
-  if (filterSem > 0) {
-    const btnLiso = document.createElement('div');
-    btnLiso.className = 'f-btn active';
-    btnLiso.style.background = 'var(--green)';
-    btnLiso.style.borderColor = 'var(--green)';
-    btnLiso.style.color = '#0a1a14';
-    btnLiso.style.marginLeft = 'auto';
-    btnLiso.innerText = `✓ Marcar S${filterSem} Liso`;
-    btnLiso.onclick = () => aprobarSemestreCompleto(filterSem);
-    container.appendChild(btnLiso);
-  }
-}
-
-function toast(type, title, smallText){
-  const wrap = document.getElementById('toast-wrap');
-  if(!wrap) return;
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = `
-    <div class="t-icon">${type==='ok'?'🏆':'⚠️'}</div>
-    <div class="t-msg">
-      <strong>${title}</strong>
-      ${smallText ? `<small>${smallText}</small>` : ''}
-    </div>
-  `;
-  wrap.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
-}
-
-function exportExcel(){
-  const wb = XLSX.utils.book_new();
-  const data = [
-    ['REPORTE ACADÉMICO - INGENIERÍA DE SISTEMAS (UNEFA)'],
-    ['Estudiante:', student.nombre || 'No registrado'],
-    ['Cédula:', student.cedula || 'No registrado'],
-    ['Sección:', student.seccion || 'No registrado'],
-    [],
-    ['CÓDIGO', 'ASIGNATURA', 'UC', 'SEMESTRE', 'ESTADO', 'INTENTOS']
-  ];
-  
-  MATERIAS.forEach(m => {
-    let intentosTxt = 'NUEVA';
-    if(historialMaterias[m.id] === 'repite_1') intentosTxt = '1ER INTENTO';
-    if(historialMaterias[m.id] === 'repite_2') intentosTxt = '2DO INTENTO';
-    if(historialMaterias[m.id] === 'repite_3') intentosTxt = '3ER INTENTO';
-    data.push([m.id, m.nombre, m.uc, m.sem, getEstado(m.id).toUpperCase(), intentosTxt]);
-  });
-  
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  XLSX.utils.book_append_sheet(wb, ws, 'Progreso');
-  XLSX.writeFile(wb, `Pensum_Sistemas_${student.cedula||'unefa'}.xlsx`);
-}
-
-function actualizarSeccionProximoSemestre() {
-  const nextSemGrid = document.getElementById('next-sem-grid');
-  if (!nextSemGrid) return;
-
-  let ucAcumuladas = 0;
-  let materiasParaCursar = [];
-  let materiasParaRepetir = [];
-
-  MATERIAS.forEach(m => {
-    if (!aprobadas.has(m.id)) {
-      const estado = getEstado(m.id);
-      if (estado === 'disponible') {
-        const estadoInscripcion = historialMaterias[m.id] || 'nueva';
-        const esRepeticion = estadoInscripcion.startsWith('repite_');
-
-        if (ucAcumuladas + m.uc <= 33) {
-          ucAcumuladas += m.uc;
-          
-          let tagRepeticion = '';
-          if (estadoInscripcion === 'repite_1') tagRepeticion = ' (R1)';
-          if (estadoInscripcion === 'repite_2') tagRepeticion = ' (R2 ⚠️)';
-          if (estadoInscripcion === 'repite_3') tagRepeticion = ' (ÚLTIMO INTENTO 🚨)';
-
-          materiasParaCursar.push({
-            ...m,
-            nombreDisplay: esRepeticion ? `${m.nombre}${tagRepeticion}` : m.nombre
-          });
-          
-          if (esRepeticion) {
-            let textoIntento = '1er Intento';
-            if(estadoInscripcion === 'repite_2') textoIntento = '2do Intento';
-            if(estadoInscripcion === 'repite_3') textoIntento = 'Último Intento';
-
-            materiasParaRepetir.push({ ...m, intentosTexto: textoIntento });
+    MATERIAS.forEach(m => {
+      if(!aprobadas.has(m.id) && getEstado(m.id) === 'disponible'){
+        let cond = (historialMaterias[m.id] && historialMaterias[m.id].condicion) || '0';
+        
+        if(ucInscritas + m.uc <= 33){ // Carga máxima UNEFA
+          ucInscritas += m.uc;
+          if(cond !== '0'){
+            repitencias.push({m, cond});
+          } else {
+            regulares.push(m);
           }
         }
       }
-    }
-  });
+    });
 
-  nextSemGrid.innerHTML = `
-    <div class="next-sem-col">
-      <h4 class="can">✨ Puede Cursar (${ucAcumuladas} / 33 UC)</h4>
-      <div id="lista-puede-cursar">
-        ${materiasParaCursar.map(m => `
-          <div class="next-mat-item can">
-            <div class="nmi-name">${m.nombreDisplay}</div>
-            <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <div class="next-sem-col">
-      <h4 class="cant">⚠️ Debe Repetir (Arrastres)</h4>
-      <div id="lista-debe-repetir">
-        ${materiasParaRepetir.length === 0 ? `
-          <div class="next-mat-item can" style="border-style: dashed; background: transparent;">
-            <div class="nmi-name" style="color: var(--text2); font-weight: normal; text-align: center;">
-              ¡Al día! No tienes materias marcadas en repitencia.
+    nextGrid.innerHTML = `
+      <div class="next-sem-col">
+        <h4 class="can">🚀 Sugeridas Regulares (${regulares.reduce((a,b)=>a+b.uc,0)} UC)</h4>
+        <div>
+          ${regulares.length === 0 ? '<p style="color:var(--text3); font-size:11px;">No hay ofertas cargadas.</p>' : regulares.map(m=>`
+            <div class="next-mat-item can">
+              <div class="nmi-name">${m.nombre}</div>
+              <div class="nmi-detail">${m.id} • ${m.uc} UC • Sem ${m.sem}</div>
             </div>
-          </div>
-        ` : materiasParaRepetir.map(m => `
-          <div class="next-mat-item cant">
-            <div class="nmi-name">${m.nombre} <b style="color:var(--orange); font-size:10px;">[${m.intentosTexto}]</b></div>
-            <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
-          </div>
-        `).join('')}
+          `).join('')}
+        </div>
       </div>
-    </div>
-  `;
+      <div class="next-sem-col">
+        <h4 class="cant">⚠️ Arrastres / Repitencia (${repitencias.reduce((a,b)=>a+b.m.uc,0)} UC)</h4>
+        <div>
+          ${repitencias.length === 0 ? '<p style="color:var(--text3); font-size:11px;">¡Felicidades! Alumno regular sin arrastres.</p>' : repitencias.map(item=>`
+            <div class="next-mat-item cant">
+              <div class="nmi-name">${item.m.nombre}</div>
+              <span style="font-size:9px; font-weight:700; background:var(--orange); color:#000; padding:2px 4px; border-radius:3px;">Intento ${item.cond}</span>
+              <div class="nmi-detail" style="width:100%; margin-top:2px;">${item.m.id} • ${item.m.uc} UC</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    
+    // Inyectar datos de UC disponibles en los textos informativos
+    document.getElementById('rs-disp').innerText = regulares.reduce((a,b)=>a+b.uc,0) + repitencias.reduce((a,b)=>a+b.m.uc,0);
+  }
+
+  // Renderizar Barras del Histograma por Semestre
+  const chartBars = document.getElementById('chart-bars');
+  if(chartBars){
+    let chartHtml = '';
+    for(let s=1; s<=9; s++){
+      let sMats = MATERIAS.filter(m=>m.sem===s);
+      let sTotal = sMats.reduce((a,b)=>a+b.uc,0);
+      let sAp = sMats.filter(m=>aprobadas.has(m.id)).reduce((a,b)=>a+b.uc,0);
+      let barPct = sTotal > 0 ? Math.round((sAp / sTotal)*100) : 0;
+      
+      chartHtml += `
+        <div class="chart-bar-wrap">
+          <div class="chart-bar-val">${sAp}</div>
+          <div class="chart-bar" style="height:${barPct || 5}px;">
+            <div class="fill-aprobada" style="height:100%;"></div>
+          </div>
+          <div class="chart-bar-label">S${s}</div>
+        </div>
+      `;
+    }
+    chartBars.innerHTML = chartHtml;
+  }
 }
 
-// ════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════
-renderFilters();
-render();
+function renderMapa(){
+  const grid = document.getElementById('pensum-grid');
+  if(!grid) return;
+  
+  let html = '';
+  for(let s=1; s<=9; s++){
+    let sMats = MATERIAS.filter(m=>m.sem===s);
+    let sTotalUc = sMats.reduce((a,b)=>a+b.uc,0);
+    
+    html += `
+      <div class="sem-col">
+        <div class="sem-col-head">SEMESTRE ${s}</div>
+        <div class="sem-col-body">
+          ${sMats.map(m=>{
+            let st = getEstado(m.id);
+            let hl = (selId === m.id) ? 'hl' : '';
+            return `
+              <div class="gm ${st} ${hl}" onclick="setTab('pensum'); showDetail('${m.id}')">
+                <div class="gm-ind"></div>
+                <div class="gm-code">${m.id}</div>
+                <div class="gm-name">${m.nombre}</div>
+                <div class="gm-uc">${m.uc} UC</div>
+              </div>
+            `;
+          }).join('')}
+          <div class="sem-uc">${sTotalUc} UC Totales</div>
+        </div>
+      </div>
+    `;
+  }
+  grid.innerHTML = html;
+}
+
+// MANAGEMENT NAVIGATION TABS
+function setTab(tabId){
+  currentTab = tabId;
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById('tab-'+tabId).classList.add('active');
+  document.getElementById('view-'+tabId).classList.add('active');
+}
+
+// FILTROS LATERALES SEMESTRALES
+function initFilters(){
+  const wrap = document.getElementById('sb-filters');
+  if(!wrap) return;
+  let html = `<button class="f-btn active" id="f-btn-0" onclick="setFilterSem(0)">TODOS</button>`;
+  for(let s=1; s<=9; s++){
+    html += `<button class="f-btn" id="f-btn-${s}" onclick="setFilterSem(${s})">S${s}</button>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function setFilterSem(s){
+  filterSem = s;
+  document.querySelectorAll('.f-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`f-btn-${s}`).classList.add('active');
+  renderList();
+}
+
+// NOTIFICACIONES UTILS
+function toast(tipo, titulo, desc){
+  const wrap = document.getElementById('toast-wrap');
+  if(!wrap) return;
+  const t = document.createElement('div');
+  t.className = `toast ${tipo}`;
+  t.innerHTML = `
+    <div class="t-icon">${tipo==='ok'?'✨':'⚠️'}</div>
+    <div class="t-msg"><strong>${titulo}</strong><small>${desc}</small></div>
+  `;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+
+function resetAll(){
+  if(confirm('¿Seguro que deseas limpiar todo el historial de progreso y condiciones?')){
+    localStorage.clear();
+    aprobadas.clear();
+    historialMaterias = {};
+    student = {nombre:"",cedula:"",seccion:""};
+    selId = null;
+    render();
+    location.reload();
+  }
+}
+
+function exportExcel(){
+  toast('ok','Exportador Excel','Generando reporte de ingeniería de sistemas...');
+  // Aquí puedes vincular la lógica de tu librería XLSX interna
+}
+
+// INITIALIZATION ON LOAD
+window.onload = function(){
+  initFilters();
+  
+  // Carga inicial datos estudiante
+  document.getElementById('f-nombre').value = student.nombre || '';
+  document.getElementById('f-cedula').value = student.cedula || '';
+  document.getElementById('f-seccion').value = student.seccion || '';
+  
+  render();
+};
 </script>
 </body>
 </html>
