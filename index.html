@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pensum UNEFA — Ingeniería de Sistemas</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-:root{
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pensum UNEFA – Ingeniería de Sistemas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+  :root{
   --bg:#07080f;--bg2:#0d1021;--bg3:#131729;--bg4:#181e30;
   --border:#1c2440;--border2:#243058;
   --accent:#4f8ef7;--accent2:#38d9f5;--accent3:#a78bfa;
@@ -984,78 +984,75 @@ function exportExcel(){
   XLSX.writeFile(wb, `Pensum_Sistemas_${student.cedula||'unefa'}.xlsx`);
 }
 
+
+
+
 function actualizarSeccionProximoSemestre() {
   const nextSemGrid = document.getElementById('next-sem-grid');
   if (!nextSemGrid) return;
 
+  // 1. Identificar materias pendientes
+  let pendientes = MATERIAS.filter(m => !aprobadas.has(m.id) && getEstado(m.id) === 'disponible');
+
   let ucAcumuladas = 0;
   let materiasParaCursar = [];
-  let materiasParaRepetir = [];
+  let materiasParaRepeat = []; 
 
+  // Prioridad absoluta a las materias de arrastre/reprobadas
   MATERIAS.forEach(m => {
     if (!aprobadas.has(m.id)) {
       const estado = getEstado(m.id);
       if (estado === 'disponible') {
-        const estadoInscripcion = historialMaterias[m.id] || 'nueva';
-        const esRepeticion = estadoInscripcion.startsWith('repite_');
+        
+        // Uso del historial local (LocalStorage) que ya tienes configurado
+        const infoHistorial = historialMaterias[m.id];
+        
+        // Verificamos si está marcada como repitencia
+        const esRepeticion = infoHistorial && infoHistorial.condicion && infoHistorial.condicion.includes('repitencia');
 
         if (ucAcumuladas + m.uc <= 33) {
           ucAcumuladas += m.uc;
           
-          let tagRepeticion = '';
-          if (estadoInscripcion === 'repite_1') tagRepeticion = ' (R1)';
-          if (estadoInscripcion === 'repite_2') tagRepeticion = ' (R2 ⚠️)';
-          if (estadoInscripcion === 'repite_3') tagRepeticion = ' (ÚLTIMO INTENTO 🚨)';
-
-          materiasParaCursar.push({
-            ...m,
-            nombreDisplay: esRepeticion ? `${m.nombre}${tagRepeticion}` : m.nombre
-          });
-          
           if (esRepeticion) {
-            let textoIntento = '1er Intento';
-            if(estadoInscripcion === 'repite_2') textoIntento = '2do Intento';
-            if(estadoInscripcion === 'repite_3') textoIntento = 'Último Intento';
-
-            materiasParaRepetir.push({ ...m, intentosTexto: textoIntento });
+            materiasParaRepeat.push(m);
+          } else {
+            materiasParaCursar.push(m);
           }
         }
       }
     }
   });
 
+  // 2. Renderizado de la interfaz en el Dashboard
   nextSemGrid.innerHTML = `
     <div class="next-sem-col">
       <h4 class="can">✨ Puede Cursar (${ucAcumuladas} / 33 UC)</h4>
       <div id="lista-puede-cursar">
-        ${materiasParaCursar.map(m => `
-          <div class="next-mat-item can">
-            <div class="nmi-name">${m.nombreDisplay}</div>
-            <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
-          </div>
-        `).join('')}
+        ${materiasParaCursar.length === 0 ? '<p class="empty-msg">No hay materias disponibles para cursar.</p>' : 
+          materiasParaCursar.map(m => `
+            <div class="next-mat-item can">
+              <div class="nmi-name">${m.nombre}</div>
+              <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
+            </div>
+          `).join('')}
       </div>
     </div>
 
     <div class="next-sem-col">
-      <h4 class="cant">⚠️ Debe Repetir (Arrastres)</h4>
+      <h4 class="must">⚠️ Debe Repetir (Arrastres)</h4>
       <div id="lista-debe-repetir">
-        ${materiasParaRepetir.length === 0 ? `
-          <div class="next-mat-item can" style="border-style: dashed; background: transparent;">
-            <div class="nmi-name" style="color: var(--text2); font-weight: normal; text-align: center;">
-              ¡Al día! No tienes materias marcadas en repitencia.
+        ${materiasParaRepeat.length === 0 ? '<p class="empty-msg">¡Al día! No tienes materias marcadas en repitencia.</p>' : 
+          materiasParaRepeat.map(m => `
+            <div class="next-mat-item must">
+              <div class="nmi-name">${m.nombre} <span class="badge-danger" style="background: var(--red); color: #fff; padding: 2px 6px; font-size: 9px; border-radius: 4px; margin-left: 5px;">Repitiendo</span></div>
+              <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
             </div>
-          </div>
-        ` : materiasParaRepetir.map(m => `
-          <div class="next-mat-item cant">
-            <div class="nmi-name">${m.nombre} <b style="color:var(--orange); font-size:10px;">[${m.intentosTexto}]</b></div>
-            <div class="nmi-detail">${m.id} • ${m.uc} UC • Semestre ${m.sem}</div>
-          </div>
-        `).join('')}
+          `).join('')}
       </div>
     </div>
   `;
 }
+
 
 // ════════════════════════════════════════════
 // INIT
