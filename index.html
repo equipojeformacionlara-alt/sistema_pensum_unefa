@@ -89,7 +89,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 /* ══ PENSUM VIEW ══ */
 #view-pensum{gap:0;}
 .sidebar{
-  width:320px;min-width:320px;background:var(--bg2);
+  width:360px;min-width:340px;background:var(--bg2);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;overflow:hidden;
 }
@@ -102,17 +102,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 }
 .sb-search input:focus{border-color:var(--accent);}
 .sb-search input::placeholder{color:var(--text3);}
+
+/* CONTENEDOR DE FILTROS Y BOTÓN LISO DE SEMESTRE */
+.sb-filters-container{
+  display:flex;align-items:center;justify-content:between;
+  padding:8px 12px;border-bottom:1px solid var(--border);gap:6px;
+}
 .sb-filters{
-  display:flex;overflow-x:auto;padding:8px 12px;gap:5px;
-  border-bottom:1px solid var(--border);scrollbar-width:none;
+  display:flex;overflow-x:auto;gap:4px;scrollbar-width:none;flex:1;
 }
 .sb-filters::-webkit-scrollbar{display:none;}
 .f-btn{
-  padding:4px 10px;border-radius:5px;font-size:11px;font-family:var(--mono);
+  padding:5px 9px;border-radius:5px;font-size:11px;font-family:var(--mono);
   font-weight:600;cursor:pointer;background:var(--bg3);color:var(--text2);
   border:1px solid var(--border);white-space:nowrap;transition:all .15s;flex-shrink:0;
 }
 .f-btn:hover,.f-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* El botón dinámico solicitado */
+.f-liso-btn{
+  padding:5px 9px;border-radius:5px;font-size:11px;font-weight:700;
+  cursor:pointer;background:var(--green);color:#07080f;
+  border:1px solid var(--green);white-space:nowrap;transition:all .15s;
+  display:none;animation:fadeIn 0.2s ease;
+}
+.f-liso-btn:hover{background:#1cbda3;border-color:#1cbda3;}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 .mat-list{flex:1;overflow-y:auto;padding:6px;}
 .mat-item{
@@ -141,10 +160,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .bdg{font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;font-weight:700;}
 .bdg-uc{background:rgba(56,217,245,.1);color:var(--accent2);}
 .bdg-sem{background:rgba(122,138,170,.1);color:var(--text2);}
-.bdg-aprobada{background:rgba(34,211,165,.12);color:var(--green);}
-.bdg-disponible{background:rgba(79,142,247,.12);color:var(--accent);}
-.bdg-bloqueada{background:rgba(107,114,128,.1);color:var(--text3);}
-.bdg-no_aprobada{background:rgba(248,113,113,.12);color:var(--red);}
 
 /* DETAIL PANEL */
 .detail{flex:1;overflow-y:auto;padding:22px 26px;}
@@ -153,43 +168,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .d-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;}
 .d-code{font-family:var(--mono);font-size:12px;color:var(--accent2);margin-bottom:4px;}
 .d-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;margin-bottom:10px;}
-.d-badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
-.d-bdg{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid;}
-.d-bdg.uc{background:rgba(56,217,245,.08);border-color:rgba(56,217,245,.25);color:var(--accent2);}
-.d-bdg.sem{background:rgba(122,138,170,.08);border-color:rgba(122,138,170,.2);color:var(--text2);}
-.d-bdg.aprobada{background:rgba(34,211,165,.08);border-color:rgba(34,211,165,.3);color:var(--green);}
-.d-bdg.disponible{background:rgba(79,142,247,.08);border-color:rgba(79,142,247,.3);color:var(--accent);}
-.d-bdg.bloqueada{background:rgba(107,114,128,.08);border-color:rgba(107,114,128,.2);color:var(--text2);}
-.d-bdg.no_aprobada{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.3);color:var(--red);}
-.sec-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;}
-.pre-list{display:flex;flex-direction:column;gap:5px;}
-.pre-item{
-  display:flex;align-items:center;gap:9px;padding:8px 11px;
-  border-radius:7px;font-size:12px;border:1px solid var(--border);
-  background:var(--bg3);cursor:pointer;transition:border-color .15s;
-}
-.pre-item:hover{border-color:var(--accent);}
-.pre-dot{width:7px;height:7px;min-width:7px;border-radius:50%;}
-.pre-dot.aprobada{background:var(--green);}
-.pre-dot.disponible{background:var(--accent);}
-.pre-dot.bloqueada,.pre-dot.no_aprobada{background:var(--text3);}
-.pre-name{flex:1;font-weight:500;}
-.pre-code{font-family:var(--mono);font-size:10px;color:var(--text3);}
-.alert{padding:11px 14px;border-radius:8px;font-size:12px;display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;line-height:1.5;}
-.alert-blocked{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);color:#fca5a5;}
-.alert-ok{background:rgba(34,211,165,.07);border:1px solid rgba(34,211,165,.25);color:#6ee7b7;}
-.alert-approved{background:rgba(34,211,165,.1);border:1px solid rgba(34,211,165,.3);color:#6ee7b7;}
-.alert-ico{font-size:15px;flex-shrink:0;}
 
 /* ══ DASHBOARD VIEW ══ */
 #view-dashboard{flex-direction:column;overflow-y:auto;padding:24px;gap:18px;}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.dash-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.dash-grid-full{grid-column:1/-1;}
+.student-form{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 18px;margin-bottom:12px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;
+}
+.form-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px;}
+.form-field input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;
+}
 
 .dcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
 .dcard h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
-.dcard h3 .ico{font-size:16px;}
 
 /* Progress ring */
 .ring-wrap{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding:10px 0;}
@@ -204,13 +198,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .ring-stat-label{font-size:12px;color:var(--text2);flex:1;}
 .ring-stat-val{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text);}
 
-/* Progress bar */
-.prog-bar-wrap{margin-bottom:10px;}
-.prog-bar-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;color:var(--text2);}
-.prog-bar-label span:last-child{font-family:var(--mono);font-weight:600;color:var(--accent);}
-.prog-track{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;}
-.prog-fill{height:100%;border-radius:4px;transition:width .5s ease;}
-
 /* Next semester section */
 .next-sem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .next-sem-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
@@ -223,18 +210,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .next-mat-item.can{background:rgba(34,211,165,.05);border-color:rgba(34,211,165,.2);}
 .next-mat-item.cant{background:rgba(251,146,60,.05);border-color:rgba(251,146,60,.35);}
 .nmi-name{flex:1;font-weight:600;line-height:1.3;}
-.nmi-detail{font-size:10px;color:var(--text2);margin-top:2px;font-family:var(--mono);}
 
 /* Bar chart */
 .chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 4px;}
 .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.chart-bar{width:100%;background:var(--bg4);border-radius:4px 4px 0 0;position:relative;transition:height .5s ease;min-height:3px;cursor:default;}
+.chart-bar{width:100%;background:var(--bg4);border-radius:4px 4px 0 0;position:relative;transition:height .5s ease;min-height:3px;}
 .chart-bar .fill-aprobada{background:linear-gradient(180deg,var(--green),rgba(34,211,165,.5));border-radius:4px 4px 0 0;height:100%;}
 .chart-bar-label{font-size:9px;font-family:var(--mono);color:var(--text3);text-align:center;}
 .chart-bar-val{font-size:9px;font-family:var(--mono);color:var(--green);text-align:center;}
-.chart-legend{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--text2);}
-.chart-legend-item{display:flex;align-items:center;gap:5px;}
-.chart-legend-dot{width:8px;height:8px;border-radius:2px;}
 
 /* ══ GRID/MAP VIEW ══ */
 #view-mapa{overflow:auto;}
@@ -249,10 +232,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   border:1px solid var(--border);border-radius:0 0 8px 8px;
   padding:5px;background:var(--bg2);display:flex;flex-direction:column;gap:4px;
 }
-.sem-uc{
-  text-align:center;font-size:9px;font-family:var(--mono);
-  color:var(--text3);padding:4px;border-top:1px solid var(--border);margin-top:1px;
-}
 .gm{
   padding:7px 8px;border-radius:6px;border:1px solid var(--border);
   cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
@@ -263,13 +242,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .gm.bloqueada{background:rgba(107,114,128,.05);opacity:.55;}
 .gm.no_aprobada{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.25);}
 .gm.hl{box-shadow:0 0 0 2px var(--accent);}
-.gm-ind{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;}
-.aprobada .gm-ind{background:var(--green);}
-.disponible .gm-ind{background:var(--accent);}
-.bloqueada .gm-ind{background:var(--text3);}
-.gm-code{font-family:var(--mono);font-size:8px;color:var(--text3);}
 .gm-name{font-size:10px;font-weight:600;line-height:1.3;margin-top:1px;color:var(--text);}
-.gm-uc{font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px;}
+.gm-uc覆{font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px;}
+
+/* COLUMNA ADICIONAL */
+.extra-col {
+  width: 175px; flex-shrink:0; display:flex; flex-direction:column; gap:8px;
+}
+.extra-box {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px; display:flex; flex-direction:column; gap:6px;
+}
+.extra-box h4 { font-size:11px; color:var(--accent2); font-family:var(--mono); text-transform:uppercase; }
+.indicator-row { display:flex; align-items:center; justify-content:space-between; font-size:11px; margin-top:4px; gap:4px; }
+.ind-status { font-weight:700; font-family:var(--mono); font-size:10px; padding:2px 6px; border-radius:4px; text-align:center;}
+.status-cumplido { background:rgba(34,211,165,.15); color:var(--green); }
+.status-pendiente { background:rgba(251,146,60,.15); color:var(--orange); }
 
 /* ── BUTTONS ── */
 .btn{
@@ -284,84 +272,35 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .btn.danger{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:var(--red);}
 .btn.excel{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:#4ade80;}
 
-/* STUDENT FORM */
-.student-form{
-  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 18px;margin-bottom:12px;
-  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;
-}
-.form-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px;}
-.form-field input{
-  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;
-  padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;
-}
-
-/* ── TOAST ── */
-.toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:7px;z-index:999;pointer-events:none;}
-.toast{
-  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
-  padding:11px 14px;font-size:12px;max-width:340px;
-  box-shadow:0 8px 24px rgba(0,0,0,.5);
-  animation:slideUp .25s ease;display:flex;align-items:flex-start;gap:9px;
-}
-.toast.err{border-color:rgba(248,113,113,.4);}
-.toast.ok{border-color:rgba(34,211,165,.4);}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-
-/* RESPONSIVE MEDIA QUERIES CORRECTED */
+/* RESPONSIVE MEDIA QUERIES */
 @media(max-width:900px){
   .stats-bar{grid-template-columns:repeat(3,1fr);}
-  .dash-grid{grid-template-columns:1fr 1fr;}
-  .student-form{grid-template-columns:1fr 1fr;}
 }
 
 @media(max-width:768px) {
   .app {
-    display: flex !important;
-    flex-direction: column !important;
-    height: auto !important;
-    overflow: visible !important;
+    display: flex !important; flex-direction: column !important;
+    height: auto !important; overflow: visible !important;
   }
-  .header {
-    padding: 10px;
-    flex-direction: column;
-    text-align: center;
-  }
-  .tabs {
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  .stats-bar {
-    grid-template-columns: repeat(2,1fr);
-  }
-  #view-pensum {
-    flex-direction: column !important;
-    height: auto !important;
-  }
+  .header { padding: 10px; flex-direction: column; text-align: center; }
+  .tabs { overflow-x: auto; white-space: nowrap; }
+  .stats-bar { grid-template-columns: repeat(2,1fr); }
+  #view-pensum { flex-direction: column !important; height: auto !important; }
   .sidebar {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-height: 400px !important;
-    border-right: none !important;
+    width: 100% !important; min-width: 0 !important;
+    max-height: 400px !important; border-right: none !important;
     border-bottom: 2px solid var(--border);
   }
-  .detail {
-    display: block !important;
-    width: 100% !important;
-    padding: 15px !important;
-    overflow-y: visible !important;
-  }
-}
-
-@media(max-width:600px){
-  .student-form{grid-template-columns:1fr;}
+  .detail { display: block !important; width: 100% !important; padding: 15px !important; overflow-y: visible !important; }
+  .pensum-grid { flex-direction: column !important; min-width: 100% !important; gap: 15px; }
+  .sem-col { width: 100% !important; }
+  .extra-col { width: 100% !important; }
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- HEADER -->
 <header class="header">
   <div class="logo">
     <div class="logo-icon">🎓</div>
@@ -376,14 +315,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </header>
 
-<!-- TABS -->
 <nav class="tabs">
   <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg-pensum">0</span></div>
   <div class="tab" onclick="setTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
   <div class="tab" onclick="setTab('mapa')" id="tab-mapa">🗺 Mapa Visual</div>
 </nav>
 
-<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-val c-green" id="st-ap">0</div><div class="stat-label">Aprobadas</div></div>
   <div class="stat"><div class="stat-val c-blue" id="st-disp">0</div><div class="stat-label">Disponibles</div></div>
@@ -393,34 +330,35 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="stat"><div class="stat-val c-gray" id="st-falta">224</div><div class="stat-label">UC Faltan</div></div>
 </div>
 
-<!-- VIEW: PENSUM -->
 <div class="view active" id="view-pensum">
   <div class="sidebar">
     <div class="sb-head">
       <h2>Materias del Pensum</h2>
       <div class="sb-search"><input type="text" id="s-search" placeholder="Buscar por nombre o código…" oninput="renderList()"></div>
     </div>
-    <div class="sb-filters" id="sb-filters"></div>
+    
+    <div class="sb-filters-container">
+      <div class="sb-filters" id="sb-filters"></div>
+      <button class="f-liso-btn" id="f-liso-btn" onclick="marcarSemestreLiso()">✓ Marcar S1 Liso</button>
+    </div>
+    
     <div class="mat-list" id="mat-list"></div>
   </div>
-  <!-- El panel de detalles al que la pantalla saltará en celulares -->
   <div class="detail" id="detail-panel">
     <div class="d-empty" id="d-empty"><div class="ico">📚</div><p>Selecciona una materia para ver sus prelaciones y configurar su Condición</p></div>
     <div id="d-content" style="display:none"></div>
   </div>
 </div>
 
-<!-- VIEW: DASHBOARD -->
 <div class="view" id="view-dashboard">
   <div class="student-form">
     <div class="form-field"><label>Nombre y Apellido</label><input id="f-nombre" placeholder="Ej: Juan Pérez" oninput="saveStudent()"></div>
     <div class="form-field"><label>Cédula de Identidad</label><input id="f-cedula" placeholder="Ej: V-12345678" oninput="saveStudent()"></div>
     <div class="form-field"><label>Sección</label><input id="f-seccion" placeholder="Ej: IS-2A" oninput="saveStudent()"></div>
-    <div><button class="btn excel" style="width:100%" onclick="exportExcel()">📊 Exportar Reporte Excel</button></div>
   </div>
 
   <div class="dcard">
-    <h3><span class="ico">🎯</span> Progreso Académico General</h3>
+    <h3>🎯 Progreso Académico General</h3>
     <div class="ring-wrap">
       <div class="ring-container">
         <svg viewBox="0 0 130 130" width="130" height="130">
@@ -449,23 +387,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 
   <div class="dcard">
-    <h3><span class="ico">📈</span> UC Aprobadas por Semestre</h3>
+    <h3>📈 UC Aprobadas por Semestre</h3>
     <div class="chart-bars" id="chart-bars"></div>
   </div>
 
   <div class="dcard">
-    <h3><span class="ico">🔮</span> Próximo Semestre — Oferta Recomendada de Inscripción</h3>
+    <h3>🔮 Próximo Semestre — Oferta Recomendada de Inscripción</h3>
     <div class="next-sem-grid" id="next-sem-grid"></div>
   </div>
 </div>
 
-<!-- VIEW: MAPA -->
 <div class="view" id="view-mapa">
   <div class="pensum-grid" id="pensum-grid"></div>
 </div>
 
 </div>
-<div class="toast-container" id="toast-wrap"></div>
 
 <script>
 const MATERIAS = [
@@ -582,6 +518,28 @@ function toggleMateria(id){
   if(selId === id) showDetail(id);
 }
 
+// NUEVA FUNCIÓN INTERACTIVA SOLICITADA PARA MARCAR EL SEMESTRE ACTUAL FILTRADO COMO LISO
+function marcarSemestreLiso(){
+  if(filterSem === 0) return;
+  
+  // Buscamos todas las materias correspondientes al semestre activo en el filtro
+  const materiasDelSemestre = MATERIAS.filter(m => m.sem === filterSem);
+  
+  // Verificamos si ya todas están aprobadas para decidir si marcar o desmarcar todo el bloque
+  const todasAprobadas = materiasDelSemestre.every(m => aprobadas.has(m.id));
+  
+  materiasDelSemestre.forEach(m => {
+    if(todasAprobadas) {
+      aprobadas.delete(m.id); // Si ya estaban todas, las limpia
+    } else {
+      aprobadas.add(m.id); // Si faltaba alguna, las aprueba todas juntas
+    }
+  });
+
+  localStorage.setItem('unefa2_ap', JSON.stringify([...aprobadas]));
+  render();
+}
+
 function cambiarCondicion(id, valor){
   if(valor === "0"){
     delete historialIntentos[id];
@@ -610,6 +568,22 @@ function render(){
   document.getElementById('st-falta').innerText = TOTAL_UC - ucap;
   document.getElementById('tbdg-pensum').innerText = MATERIAS.length;
 
+  // Manejar visibilidad y texto del botón dinámico de semestre liso
+  const lisoBtn = document.getElementById('f-liso-btn');
+  if(filterSem === 0) {
+    lisoBtn.style.display = 'none';
+  } else {
+    lisoBtn.style.display = 'block';
+    // Cambiar texto dinámico según el semestre seleccionado
+    const materiasSem = MATERIAS.filter(m => m.sem === filterSem);
+    const todasAp = materiasSem.every(m => aprobadas.has(m.id));
+    lisoBtn.innerText = todasAp ? `✕ Limpiar S${filterSem}` : `✓ Marcar S${filterSem} Liso`;
+    // Cambiar color estético si ya está completo
+    lisoBtn.style.background = todasAp ? 'var(--red)' : 'var(--green)';
+    lisoBtn.style.borderColor = todasAp ? 'var(--red)' : 'var(--green)';
+    lisoBtn.style.color = todasAp ? '#fff' : '#07080f';
+  }
+
   renderList();
   renderDashboard();
   renderMapa();
@@ -627,12 +601,7 @@ function renderList(){
     let st = getEstado(m.id);
     let sel = (selId === m.id) ? 'sel' : '';
     let checked = aprobadas.has(m.id) ? '✓' : '';
-    
-    // Texto visible de reintento en la lista
-    let tagIntento = '';
-    if(historialIntentos[m.id]){
-      tagIntento = ` <span style="color:var(--orange); font-weight:bold;">[${historialIntentos[m.id]}º Intento]</span>`;
-    }
+    let tagIntento = historialIntentos[m.id] ? ` <span style="color:var(--orange); font-weight:bold;">[${historialIntentos[m.id]}º Intento]</span>` : '';
 
     html += `
       <div class="mat-item st-${st} ${sel}" onclick="showDetail('${m.id}')">
@@ -656,7 +625,6 @@ function showDetail(id){
   document.querySelectorAll('.mat-item').forEach(el => el.classList.remove('sel'));
   
   const m = mMap[id];
-  const st = getEstado(id);
   const dContent = document.getElementById('d-content');
   document.getElementById('d-empty').style.display = 'none';
   dContent.style.display = 'block';
@@ -668,7 +636,6 @@ function showDetail(id){
       <div class="d-code">${m.id}</div>
       <div class="d-title">${m.nombre}</div>
       
-      <!-- CUADRO DE CONFIGURACIÓN DE CONDICIÓN -->
       <div style="background:var(--bg3); padding:14px; border-radius:8px; margin: 12px 0; border:1px solid var(--border2)">
         <label style="font-size:11px; font-weight:800; color:var(--accent2); text-transform:uppercase; display:block; margin-bottom:6px;">
           ⚙️ Modificar Condición / Repitencia:
@@ -689,8 +656,6 @@ function showDetail(id){
 
   renderList();
 
-  // ACOMODO EXCLUSIVO PARA CELULARES: 
-  // Al tocar la materia, baja automáticamente la vista hasta el formulario de condición.
   if(window.innerWidth <= 768) {
     document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth' });
   }
@@ -702,13 +667,11 @@ function renderDashboard(){
   document.getElementById('ring-pct').innerText = pct + '%';
   
   let circle = document.getElementById('ring-circle');
-  if(circle){
-    circle.style.strokeDashoffset = 345.4 - (pct / 100) * 345.4;
-  }
+  if(circle) circle.style.strokeDashoffset = 345.4 - (pct / 100) * 345.4;
+  
   document.getElementById('rs-ap').innerText = `${ucap} / ${TOTAL_UC}`;
   document.getElementById('rs-falt').innerText = TOTAL_UC - ucap;
 
-  // Render Sugerencias en Base a la Condición fijada
   const nextGrid = document.getElementById('next-sem-grid');
   if(nextGrid){
     let reg = [], arr = [], totalInscrito = 0;
@@ -737,7 +700,6 @@ function renderDashboard(){
     document.getElementById('rs-disp').innerText = totalInscrito;
   }
 
-  // Histograma de barras
   const chartBars = document.getElementById('chart-bars');
   if(chartBars){
     let chartHtml = '';
@@ -750,7 +712,7 @@ function renderDashboard(){
         <div class="chart-bar-wrap">
           <div class="chart-bar-val">${sAp}</div>
           <div class="chart-bar" style="height:${barPct}px;"><div class="fill-aprobada"></div></div>
-          <div class="chart-bar-label">S${s}</div>
+          <div class="chart-bar-label">S1</div>
         </div>
       `;
     }
@@ -761,6 +723,7 @@ function renderDashboard(){
 function renderMapa(){
   const grid = document.getElementById('pensum-grid');
   let html = '';
+  
   for(let s=1; s<=9; s++){
     let sMats = MATERIAS.filter(m=>m.sem===s);
     html += `
@@ -781,6 +744,36 @@ function renderMapa(){
       </div>
     `;
   }
+
+  let ucaprobadas = [...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0);
+  let regularSc = ucaprobadas >= 110; 
+  let regularLiso = (aprobadas.size === MATERIAS.length);
+
+  html += `
+    <div class="extra-col">
+      <div class="extra-box">
+        <h4>🛠️ Extracurriculares</h4>
+        <div class="indicator-row">
+          <span>Serv. Comunitario</span>
+          <span class="ind-status ${regularSc ? 'status-cumplido' : 'status-pendiente'}">
+            ${regularSc ? '✓ APTO' : '⏳ REQ.'}
+          </span>
+        </div>
+        <small style="font-size:9px; color:var(--text3)">Mínimo requerido: 110 UC</small>
+      </div>
+      
+      <div class="extra-box" style="border:1px solid var(--border2)">
+        <h4>🎓 Condición del Alumno</h4>
+        <div class="indicator-row">
+          <span>Estudiante Liso</span>
+          <span class="ind-status ${regularLiso ? 'status-cumplido' : 'status-pendiente'}">
+            ${regularLiso ? '⭐ LISO' : '❌ REGULAR'}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+
   grid.innerHTML = html;
 }
 
@@ -801,8 +794,10 @@ function initFilters(){
 function setFilterSem(s){
   filterSem = s;
   document.querySelectorAll('.f-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`f-btn-${s}`).classList.add('active');
-  renderList();
+  if(document.getElementById(`f-btn-${s}`)) {
+    document.getElementById(`f-btn-${s}`).classList.add('active');
+  }
+  render();
 }
 
 function resetAll(){
@@ -812,7 +807,17 @@ function resetAll(){
   }
 }
 
+function saveStudent(){
+  student.nombre = document.getElementById('f-nombre').value;
+  student.cedula = document.getElementById('f-cedula').value;
+  student.seccion = document.getElementById('f-seccion').value;
+  localStorage.setItem('unefa2_student', JSON.stringify(student));
+}
+
 window.onload = function(){
+  document.getElementById('f-nombre').value = student.nombre || '';
+  document.getElementById('f-cedula').value = student.cedula || '';
+  document.getElementById('f-seccion').value = student.seccion || '';
   initFilters();
   render();
 };
