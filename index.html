@@ -146,7 +146,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .bdg-bloqueada{background:rgba(107,114,128,.1);color:var(--text3);}
 .bdg-no_aprobada{background:rgba(248,113,113,.12);color:var(--red);}
 
-/* DETAIL */
+/* DETAIL PANEL */
 .detail{flex:1;overflow-y:auto;padding:22px 26px;}
 .d-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:10px;}
 .d-empty .ico{font-size:44px;opacity:.3;}
@@ -224,7 +224,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .next-mat-item.cant{background:rgba(251,146,60,.05);border-color:rgba(251,146,60,.35);}
 .nmi-name{flex:1;font-weight:600;line-height:1.3;}
 .nmi-detail{font-size:10px;color:var(--text2);margin-top:2px;font-family:var(--mono);}
-.nmi-falt{font-size:10px;color:var(--red);margin-top:2px;}
 
 /* Bar chart */
 .chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 4px;}
@@ -267,7 +266,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .gm-ind{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;}
 .aprobada .gm-ind{background:var(--green);}
 .disponible .gm-ind{background:var(--accent);}
-.bloqueada .gm-ind,.no_aprobada .gm-ind{background:var(--text3);}
+.bloqueada .gm-ind{background:var(--text3);}
 .gm-code{font-family:var(--mono);font-size:8px;color:var(--text3);}
 .gm-name{font-size:10px;font-weight:600;line-height:1.3;margin-top:1px;color:var(--text);}
 .gm-uc{font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px;}
@@ -281,14 +280,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 }
 .btn:hover{border-color:var(--accent);color:var(--text);}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-.btn.primary:hover{background:#3b78e7;}
 .btn.success{background:var(--green);border-color:var(--green);color:#0a1a14;}
-.btn.success:hover{background:#1ab89a;}
 .btn.danger{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:var(--red);}
-.btn.danger:hover{background:rgba(248,113,113,.25);}
 .btn.excel{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:#4ade80;}
-.btn.excel:hover{background:rgba(34,197,94,.2);}
-.btn:disabled{opacity:.4;cursor:not-allowed;}
 
 /* STUDENT FORM */
 .student-form{
@@ -300,10 +294,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .form-field input{
   width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;
   padding:7px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;
-  transition:border-color .15s;
 }
-.form-field input:focus{border-color:var(--accent);}
-.form-field input::placeholder{color:var(--text3);}
 
 /* ── TOAST ── */
 .toast-container{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:7px;z-index:999;pointer-events:none;}
@@ -315,21 +306,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 }
 .toast.err{border-color:rgba(248,113,113,.4);}
 .toast.ok{border-color:rgba(34,211,165,.4);}
-.t-icon{font-size:15px;flex-shrink:0;}
-.t-msg strong{display:block;font-size:12px;color:var(--text);}
-.t-msg small{font-size:11px;color:var(--text2);}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* RESPONSIVE LAYOUTS GENERALES */
+/* RESPONSIVE MEDIA QUERIES CORRECTED */
 @media(max-width:900px){
   .stats-bar{grid-template-columns:repeat(3,1fr);}
   .dash-grid{grid-template-columns:1fr 1fr;}
-  .next-sem-grid{grid-template-columns:1fr;}
   .student-form{grid-template-columns:1fr 1fr;}
 }
 
 @media(max-width:768px) {
-  /* Arreglo clave para colapsar en móviles de forma limpia */
   .app {
     display: flex !important;
     flex-direction: column !important;
@@ -355,19 +341,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   .sidebar {
     width: 100% !important;
     min-width: 0 !important;
-    max-height: 380px !important;
+    max-height: 400px !important;
     border-right: none !important;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
   }
-  /* Forzamos visualización del bloque inferior de detalle */
   .detail {
     display: block !important;
     width: 100% !important;
     padding: 15px !important;
-  }
-  #select-intento {
-    font-size: 16px !important;
-    padding: 12px !important;
+    overflow-y: visible !important;
   }
 }
 
@@ -379,6 +361,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <body>
 <div class="app">
 
+<!-- HEADER -->
 <header class="header">
   <div class="logo">
     <div class="logo-icon">🎓</div>
@@ -393,12 +376,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </header>
 
+<!-- TABS -->
 <nav class="tabs">
   <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg-pensum">0</span></div>
   <div class="tab" onclick="setTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
   <div class="tab" onclick="setTab('mapa')" id="tab-mapa">🗺 Mapa Visual</div>
 </nav>
 
+<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-val c-green" id="st-ap">0</div><div class="stat-label">Aprobadas</div></div>
   <div class="stat"><div class="stat-val c-blue" id="st-disp">0</div><div class="stat-label">Disponibles</div></div>
@@ -408,6 +393,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="stat"><div class="stat-val c-gray" id="st-falta">224</div><div class="stat-label">UC Faltan</div></div>
 </div>
 
+<!-- VIEW: PENSUM -->
 <div class="view active" id="view-pensum">
   <div class="sidebar">
     <div class="sb-head">
@@ -417,15 +403,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="sb-filters" id="sb-filters"></div>
     <div class="mat-list" id="mat-list"></div>
   </div>
-  <div class="detail" id="detail">
-    <div class="d-empty" id="d-empty"><div class="ico">📚</div><p>Selecciona una materia para ver sus prelaciones y detalles</p></div>
+  <!-- El panel de detalles al que la pantalla saltará en celulares -->
+  <div class="detail" id="detail-panel">
+    <div class="d-empty" id="d-empty"><div class="ico">📚</div><p>Selecciona una materia para ver sus prelaciones y configurar su Condición</p></div>
     <div id="d-content" style="display:none"></div>
   </div>
 </div>
 
+<!-- VIEW: DASHBOARD -->
 <div class="view" id="view-dashboard">
-
-  <div class="student-form" id="student-form">
+  <div class="student-form">
     <div class="form-field"><label>Nombre y Apellido</label><input id="f-nombre" placeholder="Ej: Juan Pérez" oninput="saveStudent()"></div>
     <div class="form-field"><label>Cédula de Identidad</label><input id="f-cedula" placeholder="Ej: V-12345678" oninput="saveStudent()"></div>
     <div class="form-field"><label>Sección</label><input id="f-seccion" placeholder="Ej: IS-2A" oninput="saveStudent()"></div>
@@ -457,7 +444,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="ring-stat-row"><div class="ring-dot" style="background:var(--accent)"></div><div class="ring-stat-label">UC Disponibles</div><div class="ring-stat-val" id="rs-disp">0</div></div>
         <div class="ring-stat-row"><div class="ring-dot" style="background:var(--yellow)"></div><div class="ring-stat-label">UC Bloqueadas</div><div class="ring-stat-val" id="rs-bloq">0</div></div>
         <div class="ring-stat-row"><div class="ring-dot" style="background:var(--text3)"></div><div class="ring-stat-label">UC Faltantes</div><div class="ring-stat-val" id="rs-falt">224</div></div>
-        <div class="ring-stat-row"><div class="ring-dot" style="background:var(--accent3)"></div><div class="ring-stat-label">Semestres completados</div><div class="ring-stat-val" id="rs-sem">0 / 9</div></div>
       </div>
     </div>
   </div>
@@ -465,34 +451,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="dcard">
     <h3><span class="ico">📈</span> UC Aprobadas por Semestre</h3>
     <div class="chart-bars" id="chart-bars"></div>
-    <div class="chart-legend">
-      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>UC Aprobadas</div>
-      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--bg4)"></div>UC Pendientes</div>
-    </div>
   </div>
 
   <div class="dcard">
-    <h3><span class="ico">📊</span> Avance por Semestre</h3>
-    <div id="sem-bars"></div>
-  </div>
-
-  <div class="dcard">
-    <h3><span class="ico">🔮</span> Próximo Semestre — Materias sugeridas para Inscripción</h3>
+    <h3><span class="ico">🔮</span> Próximo Semestre — Oferta Recomendada de Inscripción</h3>
     <div class="next-sem-grid" id="next-sem-grid"></div>
   </div>
-
 </div>
 
+<!-- VIEW: MAPA -->
 <div class="view" id="view-mapa">
   <div class="pensum-grid" id="pensum-grid"></div>
 </div>
 
-</div><div class="toast-container" id="toast-wrap"></div>
+</div>
+<div class="toast-container" id="toast-wrap"></div>
 
 <script>
-// ════════════════════════════════════════════
-// PENSUM DATA
-// ════════════════════════════════════════════
 const MATERIAS = [
   // SEMESTRE I
   {id:'MAT-21212',nombre:'Dibujo',uc:2,sem:1,prereqs:[]},
@@ -582,110 +557,55 @@ const TOTAL_UC = 224;
 const mMap = {};
 MATERIAS.forEach(m => mMap[m.id] = m);
 
-// ════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════
 let aprobadas = new Set(JSON.parse(localStorage.getItem('unefa2_ap')||'[]'));
 let student = JSON.parse(localStorage.getItem('unefa2_student')||'{"nombre":"","cedula":"","seccion":""}');
-let historialMaterias = JSON.parse(localStorage.getItem('unefa2_historial_intentos') || '{}');
+let historialIntentos = JSON.parse(localStorage.getItem('unefa2_intentos')||'{}');
 let selId = null;
 let filterSem = 0;
-let currentTab = 'pensum';
 
-function saveStudent(){
-  student.nombre = document.getElementById('f-nombre').value;
-  student.cedula = document.getElementById('f-cedula').value;
-  student.seccion = document.getElementById('f-seccion').value;
-  localStorage.setItem('unefa2_student', JSON.stringify(student));
-}
-
-// ════════════════════════════════════════════
-// LOGIC
-// ════════════════════════════════════════════
 function getEstado(id){
   if(aprobadas.has(id)) return 'aprobada';
   const m = mMap[id];
   if(!m||m.prereqs.length===0) return 'disponible';
   return m.prereqs.every(p=>aprobadas.has(p)) ? 'disponible' : 'bloqueada';
 }
-function getFaltantes(id){
-  return (mMap[id]?.prereqs||[]).filter(p=>!aprobadas.has(p));
-}
-function ucAp(){ return [...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0); }
-function semCompleto(s){
-  const mats = MATERIAS.filter(m=>m.sem===s);
-  return mats.length>0 && mats.every(m=>aprobadas.has(m.id));
-}
-function semsCompletados(){ return [...new Set(MATERIAS.map(m=>m.sem))].filter(s=>semCompleto(s)).length; }
 
 function toggleMateria(id){
-  const e = getEstado(id);
-  if(e==='bloqueada'){
-    const f = getFaltantes(id);
-    toast('err',`🔒 No puedes cursar: ${mMap[id].nombre}`,`Aprueba primero: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}`);
-    return;
-  }
+  if(getEstado(id)==='bloqueada') return;
   if(aprobadas.has(id)){
-    const dep = MATERIAS.filter(m=>m.prereqs.includes(id)&&aprobadas.has(m.id));
-    if(dep.length){
-      toast('err',`No se puede desmarcar ${mMap[id].nombre}`,`Dependencias aprobadas: ${dep.map(d=>d.nombre).join(', ')}`);
-      return;
-    }
     aprobadas.delete(id);
-    toast('ok',`Desmarcada: ${mMap[id].nombre}`,'');
   } else {
     aprobadas.add(id);
-    const desbloq = MATERIAS.filter(mm=>{
-      if(aprobadas.has(mm.id)) return false;
-      const antes = mm.prereqs.filter(p=>p!==id&&!aprobadas.has(p));
-      return antes.length>0 && mm.prereqs.filter(p=>!aprobadas.has(p)).length===0;
-    });
-    const msg = desbloq.length ? `Desbloqueaste: ${desbloq.map(d=>d.nombre).join(', ')}` : '';
-    toast('ok',`✓ Aprobada: ${mMap[id].nombre} (${mMap[id].uc} UC)`,msg);
   }
-  save(); 
+  localStorage.setItem('unefa2_ap', JSON.stringify([...aprobadas]));
   render();
   if(selId === id) showDetail(id);
 }
 
-// FUNCIONES DE CONTROL DE INTENTOS / REPITENCIAS
-function cambiarIntentoMateria(id, valorIntento) {
-  if (!historialMaterias[id]) {
-    historialMaterias[id] = {};
+function cambiarCondicion(id, valor){
+  if(valor === "0"){
+    delete historialIntentos[id];
+  } else {
+    historialIntentos[id] = valor;
   }
-  historialMaterias[id].condicion = valorIntento;
-  localStorage.setItem('unefa2_historial_intentos', JSON.stringify(historialMaterias));
-  
+  localStorage.setItem('unefa2_intentos', JSON.stringify(historialIntentos));
   render();
-  if (selId === id) showDetail(id);
-
-  if (valorIntento === '3') {
-    toast('err', '🚨 ALERTA DE PERMANENCIA', 'Asignatura en condición de 3er Intento (Última Oportunidad).');
-  }
+  if(selId === id) showDetail(id);
 }
 
-function save(){ 
-  localStorage.setItem('unefa2_ap', JSON.stringify([...aprobadas]));
-}
-
-// UI GENERAL RENDER
 function render(){
-  // Contadores Superiores
   let cAp = aprobadas.size;
-  let cDisp = 0, cBloq = 0, cNap = 0;
-  
+  let cDisp = 0, cBloq = 0;
   MATERIAS.forEach(m => {
     let e = getEstado(m.id);
-    if(e === 'disponible') cDisp++;
-    if(e === 'bloqueada') cBloq++;
+    if(e==='disponible') cDisp++;
+    if(e==='bloqueada') cBloq++;
   });
-
+  
+  let ucap = [...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0);
   document.getElementById('st-ap').innerText = cAp;
   document.getElementById('st-disp').innerText = cDisp;
   document.getElementById('st-bloq').innerText = cBloq;
-  document.getElementById('st-nap').innerText = cNap;
-  
-  let ucap = ucAp();
   document.getElementById('st-uc').innerText = ucap;
   document.getElementById('st-falta').innerText = TOTAL_UC - ucap;
   document.getElementById('tbdg-pensum').innerText = MATERIAS.length;
@@ -697,10 +617,9 @@ function render(){
 
 function renderList(){
   const list = document.getElementById('mat-list');
-  if(!list) return;
   const q = document.getElementById('s-search').value.toLowerCase();
-  
   let html = '';
+
   MATERIAS.forEach(m => {
     if(filterSem !== 0 && m.sem !== filterSem) return;
     if(q && !m.nombre.toLowerCase().includes(q) && !m.id.toLowerCase().includes(q)) return;
@@ -708,17 +627,22 @@ function renderList(){
     let st = getEstado(m.id);
     let sel = (selId === m.id) ? 'sel' : '';
     let checked = aprobadas.has(m.id) ? '✓' : '';
+    
+    // Texto visible de reintento en la lista
+    let tagIntento = '';
+    if(historialIntentos[m.id]){
+      tagIntento = ` <span style="color:var(--orange); font-weight:bold;">[${historialIntentos[m.id]}º Intento]</span>`;
+    }
 
     html += `
       <div class="mat-item st-${st} ${sel}" onclick="showDetail('${m.id}')">
         <div class="mat-cb" onclick="event.stopPropagation(); toggleMateria('${m.id}')">${checked}</div>
         <div class="mat-info">
-          <div class="mat-code">${m.id}</div>
+          <div class="mat-code">${m.id}${tagIntento}</div>
           <div class="mat-name">${m.nombre}</div>
           <div class="mat-meta">
             <span class="bdg bdg-uc">${m.uc} UC</span>
             <span class="bdg bdg-sem">Sem ${m.sem}</span>
-            <span class="bdg bdg-${st}">${st.toUpperCase()}</span>
           </div>
         </div>
       </div>
@@ -733,140 +657,87 @@ function showDetail(id){
   
   const m = mMap[id];
   const st = getEstado(id);
-  const dEmpty = document.getElementById('d-empty');
   const dContent = document.getElementById('d-content');
+  document.getElementById('d-empty').style.display = 'none';
+  dContent.style.display = 'block';
 
-  if(dEmpty) dEmpty.style.display = 'none';
-  if(dContent) dContent.style.display = 'block';
-
-  const condicionActual = (historialMaterias[id] && historialMaterias[id].condicion) || '0';
-
-  let preHtml = '';
-  m.prereqs.forEach(pid => {
-    const pm = mMap[pid];
-    const pst = getEstado(pid);
-    preHtml += `
-      <div class="pre-item" onclick="showDetail('${pm.id}')">
-        <div class="pre-dot ${pst}"></div>
-        <div class="pre-name">${pm.nombre}</div>
-        <div class="pre-code">${pm.id}</div>
-      </div>
-    `;
-  });
-
-  let alertBox = '';
-  if(st === 'bloqueada') {
-    alertBox = `<div class="alert alert-blocked"><span class="alert-ico">🔒</span> Prelaciones pendientes. No habilitada en sistema.</div>`;
-  } else if(st === 'disponible') {
-    alertBox = `<div class="alert alert-ok"><span class="alert-ico">✨</span> Lista para ofertar e inscribir.</div>`;
-  } else if(st === 'aprobada') {
-    alertBox = `<div class="alert alert-approved"><span class="alert-ico">✓</span> Asignatura aprobada de forma regular.</div>`;
-  }
+  let cond = historialIntentos[id] || "0";
 
   dContent.innerHTML = `
-    <div class="d-card">
+    <div class="d-card" style="border: 2px solid var(--accent2);">
       <div class="d-code">${m.id}</div>
       <div class="d-title">${m.nombre}</div>
-      <div class="d-badges">
-        <span class="d-bdg uc">${m.uc} UC</span>
-        <span class="d-bdg sem">Semestre ${m.sem}</span>
-        <span class="d-bdg ${st}">${st.toUpperCase()}</span>
-      </div>
       
-      <button class="btn success" style="width:100%; justify-content:center; margin-bottom:15px; font-weight:700;" onclick="toggleMateria('${m.id}')">
-        ${aprobadas.has(m.id) ? '✕ Desmarcar Aprobación' : '✓ Marcar como Aprobada'}
-      </button>
-
-      <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:12px;">
-        <div class="sec-title">CONDICIÓN DE LA ASIGNATURA:</div>
-        <div class="form-field">
-          <select id="select-intento" onchange="cambiarIntentoMateria('${m.id}', this.value)" style="width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); font-family:var(--font); font-size:13px; outline:none; cursor:pointer;">
-            <option value="0" ${condicionActual === '0' ? 'selected' : ''}>🔹 Nueva / Nunca inscrita</option>
-            <option value="1" ${condicionActual === '1' ? 'selected' : ''}>⚠️ Repitiendo (1er Intento)</option>
-            <option value="2" ${condicionActual === '2' ? 'selected' : ''}>⚠️ Repitiendo (2do Intento)</option>
-            <option value="3" ${condicionActual === '3' ? 'selected' : ''}>🚨 Última Oportunidad (3er Intento)</option>
-          </select>
-        </div>
+      <!-- CUADRO DE CONFIGURACIÓN DE CONDICIÓN -->
+      <div style="background:var(--bg3); padding:14px; border-radius:8px; margin: 12px 0; border:1px solid var(--border2)">
+        <label style="font-size:11px; font-weight:800; color:var(--accent2); text-transform:uppercase; display:block; margin-bottom:6px;">
+          ⚙️ Modificar Condición / Repitencia:
+        </label>
+        <select onchange="cambiarCondicion('${m.id}', this.value)" style="width:100%; background:var(--bg4); border:1px solid var(--border2); padding:10px; color:#fff; font-size:13px; border-radius:6px; outline:none; font-family:var(--font); cursor:pointer;">
+          <option value="0" ${cond==="0"?'selected':''}>🔹 Nueva (Cursando Regular)</option>
+          <option value="1" ${cond==="1"?'selected':''}>⚠️ Repitiendo (1er Intento)</option>
+          <option value="2" ${cond==="2"?'selected':''}>⚠️ Repitiendo (2do Intento)</option>
+          <option value="3" ${cond==="3"?'selected':''}>🚨 Última Oportunidad (3er Intento)</option>
+        </select>
       </div>
+
+      <button class="btn success" style="width:100%; justify-content:center; padding:10px;" onclick="toggleMateria('${m.id}')">
+        ${aprobadas.has(m.id) ? '✕ Quitar Aprobación' : '✓ Marcar como Aprobada'}
+      </button>
     </div>
-    ${alertBox}
-    <div class="sec-title" style="margin-top:15px;">Prelaciones Obligatorias (${m.prereqs.length})</div>
-    <div class="pre-list">${preHtml || '<p style="font-size:11px; color:var(--text3)">Ninguna</p>'}</div>
   `;
 
   renderList();
+
+  // ACOMODO EXCLUSIVO PARA CELULARES: 
+  // Al tocar la materia, baja automáticamente la vista hasta el formulario de condición.
+  if(window.innerWidth <= 768) {
+    document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 function renderDashboard(){
-  // Ring de progreso
-  let ucap = ucAp();
+  let ucap = [...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0);
   let pct = Math.round((ucap / TOTAL_UC) * 100) || 0;
   document.getElementById('ring-pct').innerText = pct + '%';
   
   let circle = document.getElementById('ring-circle');
   if(circle){
-    let totalCirc = 2 * Math.PI * 55; 
-    let strokeDash = totalCirc - (pct / 100) * totalCirc;
-    circle.style.strokeDashoffset = strokeDash;
+    circle.style.strokeDashoffset = 345.4 - (pct / 100) * 345.4;
   }
-
   document.getElementById('rs-ap').innerText = `${ucap} / ${TOTAL_UC}`;
   document.getElementById('rs-falt').innerText = TOTAL_UC - ucap;
-  document.getElementById('rs-sem').innerText = `${semsCompletados()} / 9`;
 
-  // Cálculos Próximo Semestre (Dividido en columnas)
+  // Render Sugerencias en Base a la Condición fijada
   const nextGrid = document.getElementById('next-sem-grid');
   if(nextGrid){
-    let ucInscritas = 0;
-    let regulares = [];
-    let repitencias = [];
-
+    let reg = [], arr = [], totalInscrito = 0;
+    
     MATERIAS.forEach(m => {
-      if(!aprobadas.has(m.id) && getEstado(m.id) === 'disponible'){
-        let cond = (historialMaterias[m.id] && historialMaterias[m.id].condicion) || '0';
-        
-        if(ucInscritas + m.uc <= 33){ // Carga máxima UNEFA
-          ucInscritas += m.uc;
-          if(cond !== '0'){
-            repitencias.push({m, cond});
-          } else {
-            regulares.push(m);
-          }
+      if(!aprobadas.has(m.id) && getEstado(m.id) === 'disponible' && (totalInscrito + m.uc <= 33)){
+        totalInscrito += m.uc;
+        if(historialIntentos[m.id]){
+          arr.push(m);
+        } else {
+          reg.push(m);
         }
       }
     });
 
     nextGrid.innerHTML = `
       <div class="next-sem-col">
-        <h4 class="can">🚀 Sugeridas Regulares (${regulares.reduce((a,b)=>a+b.uc,0)} UC)</h4>
-        <div>
-          ${regulares.length === 0 ? '<p style="color:var(--text3); font-size:11px;">No hay ofertas cargadas.</p>' : regulares.map(m=>`
-            <div class="next-mat-item can">
-              <div class="nmi-name">${m.nombre}</div>
-              <div class="nmi-detail">${m.id} • ${m.uc} UC • Sem ${m.sem}</div>
-            </div>
-          `).join('')}
-        </div>
+        <h4 class="can">🚀 Regulares Sugeridas</h4>
+        ${reg.map(m=>`<div class="next-mat-item can"><b>${m.nombre}</b><br><small>${m.id} (${m.uc} UC)</small></div>`).join('') || '<p style="color:var(--text3);font-size:11px;">Ninguna</p>'}
       </div>
       <div class="next-sem-col">
-        <h4 class="cant">⚠️ Arrastres / Repitencia (${repitencias.reduce((a,b)=>a+b.m.uc,0)} UC)</h4>
-        <div>
-          ${repitencias.length === 0 ? '<p style="color:var(--text3); font-size:11px;">¡Felicidades! Alumno regular sin arrastres.</p>' : repitencias.map(item=>`
-            <div class="next-mat-item cant">
-              <div class="nmi-name">${item.m.nombre}</div>
-              <span style="font-size:9px; font-weight:700; background:var(--orange); color:#000; padding:2px 4px; border-radius:3px;">Intento ${item.cond}</span>
-              <div class="nmi-detail" style="width:100%; margin-top:2px;">${item.m.id} • ${item.m.uc} UC</div>
-            </div>
-          `).join('')}
-        </div>
+        <h4 class="cant">⚠️ Arrastres / Repitiendo</h4>
+        ${arr.map(m=>`<div class="next-mat-item cant"><b>${m.nombre}</b> <span style="background:var(--orange);color:#000;padding:1px 4px;font-size:9px;border-radius:3px;">Intento ${historialIntentos[m.id]}</span><br><small>${m.id}</small></div>`).join('') || '<p style="color:var(--text3);font-size:11px;">Ninguno</p>'}
       </div>
     `;
-    
-    // Inyectar datos de UC disponibles en los textos informativos
-    document.getElementById('rs-disp').innerText = regulares.reduce((a,b)=>a+b.uc,0) + repitencias.reduce((a,b)=>a+b.m.uc,0);
+    document.getElementById('rs-disp').innerText = totalInscrito;
   }
 
-  // Renderizar Barras del Histograma por Semestre
+  // Histograma de barras
   const chartBars = document.getElementById('chart-bars');
   if(chartBars){
     let chartHtml = '';
@@ -874,14 +745,11 @@ function renderDashboard(){
       let sMats = MATERIAS.filter(m=>m.sem===s);
       let sTotal = sMats.reduce((a,b)=>a+b.uc,0);
       let sAp = sMats.filter(m=>aprobadas.has(m.id)).reduce((a,b)=>a+b.uc,0);
-      let barPct = sTotal > 0 ? Math.round((sAp / sTotal)*100) : 0;
-      
+      let barPct = sTotal > 0 ? Math.round((sAp / sTotal)*120) : 0;
       chartHtml += `
         <div class="chart-bar-wrap">
           <div class="chart-bar-val">${sAp}</div>
-          <div class="chart-bar" style="height:${barPct || 5}px;">
-            <div class="fill-aprobada" style="height:100%;"></div>
-          </div>
+          <div class="chart-bar" style="height:${barPct}px;"><div class="fill-aprobada"></div></div>
           <div class="chart-bar-label">S${s}</div>
         </div>
       `;
@@ -892,13 +760,9 @@ function renderDashboard(){
 
 function renderMapa(){
   const grid = document.getElementById('pensum-grid');
-  if(!grid) return;
-  
   let html = '';
   for(let s=1; s<=9; s++){
     let sMats = MATERIAS.filter(m=>m.sem===s);
-    let sTotalUc = sMats.reduce((a,b)=>a+b.uc,0);
-    
     html += `
       <div class="sem-col">
         <div class="sem-col-head">SEMESTRE ${s}</div>
@@ -908,14 +772,11 @@ function renderMapa(){
             let hl = (selId === m.id) ? 'hl' : '';
             return `
               <div class="gm ${st} ${hl}" onclick="setTab('pensum'); showDetail('${m.id}')">
-                <div class="gm-ind"></div>
-                <div class="gm-code">${m.id}</div>
                 <div class="gm-name">${m.nombre}</div>
                 <div class="gm-uc">${m.uc} UC</div>
               </div>
             `;
           }).join('')}
-          <div class="sem-uc">${sTotalUc} UC Totales</div>
         </div>
       </div>
     `;
@@ -923,24 +784,17 @@ function renderMapa(){
   grid.innerHTML = html;
 }
 
-// MANAGEMENT NAVIGATION TABS
 function setTab(tabId){
-  currentTab = tabId;
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  
   document.getElementById('tab-'+tabId).classList.add('active');
   document.getElementById('view-'+tabId).classList.add('active');
 }
 
-// FILTROS LATERALES SEMESTRALES
 function initFilters(){
   const wrap = document.getElementById('sb-filters');
-  if(!wrap) return;
   let html = `<button class="f-btn active" id="f-btn-0" onclick="setFilterSem(0)">TODOS</button>`;
-  for(let s=1; s<=9; s++){
-    html += `<button class="f-btn" id="f-btn-${s}" onclick="setFilterSem(${s})">S${s}</button>`;
-  }
+  for(let s=1; s<=9; s++) html += `<button class="f-btn" id="f-btn-${s}" onclick="setFilterSem(${s})">S${s}</button>`;
   wrap.innerHTML = html;
 }
 
@@ -951,46 +805,15 @@ function setFilterSem(s){
   renderList();
 }
 
-// NOTIFICACIONES UTILS
-function toast(tipo, titulo, desc){
-  const wrap = document.getElementById('toast-wrap');
-  if(!wrap) return;
-  const t = document.createElement('div');
-  t.className = `toast ${tipo}`;
-  t.innerHTML = `
-    <div class="t-icon">${tipo==='ok'?'✨':'⚠️'}</div>
-    <div class="t-msg"><strong>${titulo}</strong><small>${desc}</small></div>
-  `;
-  wrap.appendChild(t);
-  setTimeout(()=>t.remove(), 3500);
-}
-
 function resetAll(){
-  if(confirm('¿Seguro que deseas limpiar todo el historial de progreso y condiciones?')){
+  if(confirm('¿Deseas reiniciar los datos?')){
     localStorage.clear();
-    aprobadas.clear();
-    historialMaterias = {};
-    student = {nombre:"",cedula:"",seccion:""};
-    selId = null;
-    render();
     location.reload();
   }
 }
 
-function exportExcel(){
-  toast('ok','Exportador Excel','Generando reporte de ingeniería de sistemas...');
-  // Aquí puedes vincular la lógica de tu librería XLSX interna
-}
-
-// INITIALIZATION ON LOAD
 window.onload = function(){
   initFilters();
-  
-  // Carga inicial datos estudiante
-  document.getElementById('f-nombre').value = student.nombre || '';
-  document.getElementById('f-cedula').value = student.cedula || '';
-  document.getElementById('f-seccion').value = student.seccion || '';
-  
   render();
 };
 </script>
