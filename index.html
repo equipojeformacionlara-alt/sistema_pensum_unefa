@@ -422,6 +422,7 @@ select{
   </div>
   <div class="header-actions">
     <button class="btn excel" onclick="exportExcel()">📊 Excel</button>
+    <button class="btn" onclick="desmarcarTodas()" style="border-color:rgba(251,191,36,.4);color:var(--yellow);background:rgba(251,191,36,.08);">☐ Desmarcar todas</button>
     <button class="btn danger" onclick="resetAll()">↺ Reiniciar</button>
   </div>
 </header>
@@ -711,21 +712,49 @@ function cambiarHistorialMateria(id, estado) {
 
 function aprobarSemestreCompleto(semestre) {
   const materiasDelSemestre = MATERIAS.filter(m => m.sem === semestre);
-  let modificoAlgo = false;
+  let marcadas = [];
+  let bloqueadas = [];
+
   materiasDelSemestre.forEach(m => {
     if (aprobadas.has(m.id)) return;
-    const puedeAprobar = m.prereqs.every(p => aprobadas.has(p));
-    if (puedeAprobar) {
+    const faltantes = m.prereqs.filter(p => !aprobadas.has(p));
+    if (faltantes.length === 0) {
       aprobadas.add(m.id);
-      modificoAlgo = true;
+      marcadas.push(m.nombre);
     } else {
-      toast('err', `No se pudo marcar: ${m.nombre}`, `Faltan prelaciones de semestres anteriores.`);
+      bloqueadas.push({
+        nombre: m.nombre,
+        faltan: faltantes.map(p => mMap[p]?.nombre || p)
+      });
     }
   });
-  if (modificoAlgo) {
+
+  if (marcadas.length > 0) {
     save(); render();
-    toast('ok', `¡Semestre ${semestre} completado!`, `Se marcaron las materias disponibles.`);
+    toast('ok', `Semestre ${semestre}: ${marcadas.length} marcada(s)`, marcadas.join(', '));
   }
+
+  // Mostrar cada bloqueada con sus prelaciones faltantes
+  bloqueadas.forEach(b => {
+    toast('err', `🔒 Sin prelación: ${b.nombre}`, `Falta aprobar: ${b.faltan.join(', ')}`);
+  });
+
+  if (marcadas.length === 0 && bloqueadas.length === 0) {
+    toast('ok', `Semestre ${semestre} ya estaba completo`, '');
+  }
+}
+
+function desmarcarTodas() {
+  const count = aprobadas.size;
+  if (count === 0) { toast('err', 'No hay materias aprobadas', ''); return; }
+  if (!confirm(`¿Desmarcar las ${count} materias aprobadas?\n\nEsto NO borra el historial de condiciones (arrastres).`)) return;
+  aprobadas.clear();
+  save();
+  selId = null;
+  document.getElementById('d-empty').style.display = 'flex';
+  document.getElementById('d-content').style.display = 'none';
+  render();
+  toast('ok', `${count} materias desmarcadas`, 'El historial de condiciones se conserva.');
 }
 
 // ════════════════════════════════════════════
@@ -1115,3 +1144,4 @@ render();
 </script>
 </body>
 </html>
+
