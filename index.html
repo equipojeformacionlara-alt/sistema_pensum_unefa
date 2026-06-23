@@ -6,186 +6,71 @@
 <title>Pensum UNEFA — Ingeniería de Sistemas</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, update, remove, push }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-  // ══════════════════════════════════════════
-  // 🔧 REEMPLAZA CON TU CONFIGURACIÓN FIREBASE
-  // ══════════════════════════════════════════
-  const firebaseConfig = {
-    apiKey:            "TU_API_KEY",
-    authDomain:        "TU_PROYECTO.firebaseapp.com",
-    databaseURL:       "https://TU_PROYECTO-default-rtdb.firebaseio.com",
-    projectId:         "TU_PROYECTO",
-    storageBucket:     "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId:             "TU_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
-
-  // Exponer al scope global para que el JS principal lo use
-  window._fb = { db, ref, onValue, set, update, remove, push };
-
-  // Escuchar cambios en tiempo real
-  onValue(ref(db, 'pensum/materias'), snap => {
-    const raw = snap.val() || {};
-    const arr = Object.values(raw).filter(m => m.activa !== false);
-    window._fb.materias = arr;
-    if (typeof window.onFirebaseData === 'function') window.onFirebaseData(arr);
-  });
-
-  onValue(ref(db, 'pensum/info'), snap => {
-    const info = snap.val() || {};
-    window._fb.info = info;
-    if (typeof window.onFirebaseInfo === 'function') window.onFirebaseInfo(info);
-  });
-</script>
-
 <style>
-/* ══════════════════════════════════════════
-   VARIABLES & RESET
-══════════════════════════════════════════ */
-:root{
-  --bg:#07080f;--bg2:#0d1021;--bg3:#131729;--bg4:#181e30;
-  --border:#1c2440;--border2:#243058;
-  --accent:#4f8ef7;--accent2:#38d9f5;--accent3:#a78bfa;
-  --green:#22d3a5;--red:#f87171;--yellow:#fbbf24;--orange:#fb923c;
-  --text:#dde4f5;--text2:#7a8aaa;--text3:#4a5570;
-  --font:'Syne',sans-serif;--mono:'IBM Plex Mono',monospace;
-  --radius:10px;--touch-min:44px;
-}
+:root{--bg:#07080f;--bg2:#0d1021;--bg3:#131729;--bg4:#181e30;--border:#1c2440;--border2:#243058;--accent:#4f8ef7;--accent2:#38d9f5;--accent3:#a78bfa;--green:#22d3a5;--red:#f87171;--yellow:#fbbf24;--orange:#fb923c;--text:#dde4f5;--text2:#7a8aaa;--text3:#4a5570;--font:'Syne',sans-serif;--mono:'IBM Plex Mono',monospace;--radius:10px;--touch-min:44px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-html{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+html{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-text-size-adjust:100%;}
 body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-
-/* ══════════════════════════════════════════
-   APP LAYOUT
-══════════════════════════════════════════ */
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 .app{display:flex;flex-direction:column;min-height:100vh;}
-
-/* HEADER */
-.header{
-  background:linear-gradient(135deg,#0b0f1e,#0d1226);
-  border-bottom:1px solid var(--border);padding:12px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;
-}
+.header{background:linear-gradient(135deg,#0b0f1e,#0d1226);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
 .logo{display:flex;align-items:center;gap:12px;}
-.logo-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;}
 .logo h1{font-size:15px;font-weight:800;letter-spacing:-.5px;color:var(--text);}
 .logo p{font-size:10px;color:var(--text2);font-family:var(--mono);margin-top:1px;}
 .header-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
-
-/* FIREBASE STATUS BADGE */
-.fb-status{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;
-  font-family:var(--mono);border:1px solid;transition:all .3s;
-}
-.fb-status.connecting{border-color:var(--yellow);color:var(--yellow);background:rgba(251,191,36,.08);}
-.fb-status.connected{border-color:var(--green);color:var(--green);background:rgba(34,211,165,.08);}
-.fb-status.error{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08);}
-.fb-status.offline{border-color:var(--text3);color:var(--text3);background:rgba(74,85,112,.08);}
+.fb-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);border:1px solid;}
+.fb-badge.connecting{border-color:var(--yellow);color:var(--yellow);background:rgba(251,191,36,.08);}
+.fb-badge.connected{border-color:var(--green);color:var(--green);background:rgba(34,211,165,.08);}
+.fb-badge.error{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08);}
 .fb-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
 .fb-dot.pulse{animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-
-/* TABS */
-.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:0 12px;gap:0;overflow-x:auto;scrollbar-width:none;
-  position:sticky;top:62px;z-index:99;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 12px;overflow-x:auto;scrollbar-width:none;position:sticky;top:62px;z-index:99;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{padding:12px 14px;font-size:12px;font-weight:600;cursor:pointer;
-  color:var(--text2);border-bottom:2px solid transparent;transition:all .2s;
-  white-space:nowrap;display:flex;align-items:center;gap:5px;min-height:var(--touch-min);}
-.tab:hover{color:var(--text);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab{padding:12px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;min-height:var(--touch-min);}
+.tab:hover{color:var(--text);}.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .tab-badge{background:var(--bg4);border-radius:10px;padding:1px 6px;font-size:10px;font-family:var(--mono);font-weight:600;}
 .tab.active .tab-badge{background:rgba(79,142,247,.15);color:var(--accent);}
-
-/* STATS BAR */
+.tab-badge.adm{background:rgba(167,139,250,.15);color:var(--accent3);}
 .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border);}
-.stat{background:var(--bg2);padding:10px 12px;border-right:1px solid var(--border);
-  border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
-.stat:nth-child(3n){border-right:none;}
-.stat:nth-last-child(-n+3){border-bottom:none;}
+.stat{background:var(--bg2);padding:10px 12px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
+.stat:nth-child(3n){border-right:none;}.stat:nth-last-child(-n+3){border-bottom:none;}
 .stat-val{font-size:20px;font-weight:800;font-family:var(--mono);line-height:1;}
-.stat-val.c-green{color:var(--green);}
-.stat-val.c-blue{color:var(--accent);}
-.stat-val.c-yellow{color:var(--yellow);}
-.stat-val.c-red{color:var(--red);}
-.stat-val.c-purple{color:var(--accent3);}
-.stat-val.c-gray{color:var(--text2);}
+.stat-val.c-green{color:var(--green);}.stat-val.c-blue{color:var(--accent);}.stat-val.c-yellow{color:var(--yellow);}.stat-val.c-red{color:var(--red);}.stat-val.c-purple{color:var(--accent3);}.stat-val.c-gray{color:var(--text2);}
 .stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;}
-
-/* VIEWS */
-.view{display:none;}
-.view.active{display:block;}
-
-/* ══════════════════════════════════════════
-   PENSUM VIEW
-══════════════════════════════════════════ */
+.view{display:none;}.view.active{display:block;}
 .sidebar{width:100%;background:var(--bg2);border-bottom:1px solid var(--border);}
 .sb-head{padding:12px 14px 10px;border-bottom:1px solid var(--border);}
 .sb-head h2{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;}
-.sb-search input{
-  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;
-  padding:9px 12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;
-  transition:border-color .15s;min-height:var(--touch-min);}
-.sb-search input:focus{border-color:var(--accent);}
-.sb-search input::placeholder{color:var(--text3);}
-.sb-filters{display:flex;overflow-x:auto;padding:8px 10px;gap:5px;
-  border-bottom:1px solid var(--border);scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.sb-search input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;min-height:var(--touch-min);}
+.sb-search input:focus{border-color:var(--accent);}.sb-search input::placeholder{color:var(--text3);}
+.sb-filters{display:flex;overflow-x:auto;padding:8px 10px;gap:5px;border-bottom:1px solid var(--border);scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .sb-filters::-webkit-scrollbar{display:none;}
-.f-btn{padding:7px 12px;border-radius:6px;font-size:12px;font-family:var(--mono);
-  font-weight:600;cursor:pointer;background:var(--bg3);color:var(--text2);
-  border:1px solid var(--border);white-space:nowrap;transition:all .15s;flex-shrink:0;
-  min-height:36px;display:flex;align-items:center;}
+.f-btn{padding:7px 12px;border-radius:6px;font-size:12px;font-family:var(--mono);font-weight:600;cursor:pointer;background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;transition:all .15s;flex-shrink:0;min-height:36px;display:flex;align-items:center;}
 .f-btn:hover,.f-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-
 .mat-list{padding:6px;}
-.mat-item{
-  display:flex;align-items:flex-start;gap:10px;padding:11px 12px;
-  border-radius:8px;margin-bottom:4px;border:1px solid transparent;
-  cursor:pointer;transition:all .15s;min-height:var(--touch-min);}
-.mat-item:hover{background:var(--bg3);border-color:var(--border);}
-.mat-item.sel{background:rgba(79,142,247,.07);border-color:rgba(79,142,247,.3);}
+.mat-item{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-radius:8px;margin-bottom:4px;border:1px solid transparent;cursor:pointer;transition:all .15s;min-height:var(--touch-min);}
+.mat-item:hover{background:var(--bg3);border-color:var(--border);}.mat-item.sel{background:rgba(79,142,247,.07);border-color:rgba(79,142,247,.3);}
 .mat-item.st-aprobada{border-color:rgba(34,211,165,.2);background:rgba(34,211,165,.04);}
 .mat-item.st-disponible{border-color:rgba(79,142,247,.15);background:rgba(79,142,247,.03);}
 .mat-item.st-bloqueada{opacity:.5;}
-.mat-cb{width:22px;height:22px;min-width:22px;border-radius:5px;
-  border:2px solid var(--border2);background:var(--bg4);
-  display:flex;align-items:center;justify-content:center;
-  margin-top:2px;transition:all .15s;font-size:12px;color:#fff;}
+.mat-cb{width:22px;height:22px;min-width:22px;border-radius:5px;border:2px solid var(--border2);background:var(--bg4);display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .15s;font-size:12px;color:#fff;}
 .st-aprobada .mat-cb{background:var(--green);border-color:var(--green);}
 .mat-info{flex:1;min-width:0;}
 .mat-code{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.3px;}
 .mat-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;margin-top:1px;}
 .mat-meta{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;align-items:center;}
 .bdg{font-size:9px;font-family:var(--mono);padding:3px 7px;border-radius:3px;font-weight:700;}
-.bdg-uc{background:rgba(56,217,245,.1);color:var(--accent2);}
-.bdg-sem{background:rgba(122,138,170,.1);color:var(--text2);}
-.bdg-aprobada{background:rgba(34,211,165,.12);color:var(--green);}
-.bdg-disponible{background:rgba(79,142,247,.12);color:var(--accent);}
+.bdg-uc{background:rgba(56,217,245,.1);color:var(--accent2);}.bdg-sem{background:rgba(122,138,170,.1);color:var(--text2);}
+.bdg-aprobada{background:rgba(34,211,165,.12);color:var(--green);}.bdg-disponible{background:rgba(79,142,247,.12);color:var(--accent);}
 .bdg-bloqueada{background:rgba(107,114,128,.1);color:var(--text3);}
-
-/* DETAIL */
 .detail{padding:16px;}
-.d-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;color:var(--text3);gap:10px;padding:30px;}
+.d-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;color:var(--text3);gap:10px;padding:30px;text-align:center;}
 .d-empty .ico{font-size:36px;opacity:.3;}
 .d-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
 .d-code{font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:4px;}
-.d-title{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;margin-bottom:10px;}
+.d-title{font-size:18px;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:10px;}
 .d-badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
 .d-bdg{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid;}
 .d-bdg.uc{background:rgba(56,217,245,.08);border-color:rgba(56,217,245,.25);color:var(--accent2);}
@@ -195,25 +80,16 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
 .d-bdg.bloqueada{background:rgba(107,114,128,.08);border-color:rgba(107,114,128,.2);color:var(--text2);}
 .sec-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;}
 .pre-list{display:flex;flex-direction:column;gap:5px;}
-.pre-item{display:flex;align-items:center;gap:9px;padding:11px 12px;
-  border-radius:7px;font-size:13px;border:1px solid var(--border);
-  background:var(--bg3);cursor:pointer;transition:border-color .15s;min-height:var(--touch-min);}
+.pre-item{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:7px;font-size:13px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:border-color .15s;min-height:var(--touch-min);}
 .pre-item:hover{border-color:var(--accent);}
 .pre-dot{width:8px;height:8px;min-width:8px;border-radius:50%;}
-.pre-dot.aprobada{background:var(--green);}
-.pre-dot.disponible{background:var(--accent);}
-.pre-dot.bloqueada{background:var(--text3);}
-.pre-name{flex:1;font-weight:500;}
-.pre-code{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.pre-dot.aprobada{background:var(--green);}.pre-dot.disponible{background:var(--accent);}.pre-dot.bloqueada{background:var(--text3);}
+.pre-name{flex:1;font-weight:500;}.pre-code{font-family:var(--mono);font-size:10px;color:var(--text3);}
 .alert{padding:12px 14px;border-radius:8px;font-size:13px;display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;line-height:1.5;}
 .alert-blocked{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);color:#fca5a5;}
 .alert-ok{background:rgba(34,211,165,.07);border:1px solid rgba(34,211,165,.25);color:#6ee7b7;}
 .alert-approved{background:rgba(34,211,165,.1);border:1px solid rgba(34,211,165,.3);color:#6ee7b7;}
 .alert-ico{font-size:16px;flex-shrink:0;}
-
-/* ══════════════════════════════════════════
-   DASHBOARD VIEW
-══════════════════════════════════════════ */
 #view-dashboard{padding:16px;display:none;flex-direction:column;gap:14px;}
 #view-dashboard.active{display:flex;}
 .dcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
@@ -236,8 +112,7 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
 .prog-fill{height:100%;border-radius:4px;transition:width .5s ease;}
 .next-sem-grid{display:flex;flex-direction:column;gap:12px;}
 .next-sem-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
-.next-sem-col h4.can{color:var(--green);}
-.next-sem-col h4.cant{color:var(--red);}
+.next-sem-col h4.can{color:var(--green);}.next-sem-col h4.cant{color:var(--red);}
 .next-mat-item{padding:10px 12px;border-radius:7px;font-size:12px;border:1px solid;margin-bottom:4px;display:flex;align-items:flex-start;gap:7px;}
 .next-mat-item.can{background:rgba(34,211,165,.05);border-color:rgba(34,211,165,.2);}
 .next-mat-item.cant{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.2);}
@@ -246,203 +121,91 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
 .nmi-falt{font-size:10px;color:var(--red);margin-top:2px;}
 .chart-bars{display:flex;align-items:flex-end;gap:5px;height:100px;padding:0 2px;}
 .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.chart-bar{width:100%;background:var(--bg4);border-radius:3px 3px 0 0;position:relative;transition:height .5s ease;min-height:3px;}
-.chart-bar .fill-aprobada{background:linear-gradient(180deg,var(--green),rgba(34,211,165,.5));border-radius:3px 3px 0 0;height:100%;}
+.chart-bar{width:100%;background:var(--bg4);border-radius:3px 3px 0 0;position:relative;min-height:3px;}
+.chart-bar .fill-ap{background:linear-gradient(180deg,var(--green),rgba(34,211,165,.5));border-radius:3px 3px 0 0;height:100%;}
 .chart-bar-label{font-size:8px;font-family:var(--mono);color:var(--text3);text-align:center;}
 .chart-bar-val{font-size:8px;font-family:var(--mono);color:var(--green);text-align:center;}
 .chart-legend{display:flex;gap:12px;margin-top:10px;font-size:11px;color:var(--text2);}
 .chart-legend-item{display:flex;align-items:center;gap:5px;}
 .chart-legend-dot{width:8px;height:8px;border-radius:2px;}
-
-/* ══════════════════════════════════════════
-   MAPA VIEW
-══════════════════════════════════════════ */
 #view-mapa{display:none;overflow:auto;-webkit-overflow-scrolling:touch;}
 #view-mapa.active{display:block;}
 .pensum-grid{display:flex;gap:8px;padding:16px;min-width:max-content;}
 .sem-col{width:140px;flex-shrink:0;}
-.sem-col-head{text-align:center;padding:6px;background:var(--bg3);border-radius:8px 8px 0 0;
-  font-size:10px;font-weight:700;font-family:var(--mono);color:var(--accent);
-  border:1px solid var(--border);border-bottom:none;}
+.sem-col-head{text-align:center;padding:6px;background:var(--bg3);border-radius:8px 8px 0 0;font-size:10px;font-weight:700;font-family:var(--mono);color:var(--accent);border:1px solid var(--border);border-bottom:none;}
 .sem-col-body{border:1px solid var(--border);border-radius:0 0 8px 8px;padding:5px;background:var(--bg2);display:flex;flex-direction:column;gap:4px;}
 .sem-uc{text-align:center;font-size:9px;font-family:var(--mono);color:var(--text3);padding:4px;border-top:1px solid var(--border);}
 .gm{padding:7px 8px;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
 .gm:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4);}
 .gm.aprobada{background:rgba(34,211,165,.08);border-color:rgba(34,211,165,.35);}
 .gm.disponible{background:rgba(79,142,247,.06);border-color:rgba(79,142,247,.25);}
-.gm.bloqueada{opacity:.55;}
-.gm.hl{box-shadow:0 0 0 2px var(--accent);}
+.gm.bloqueada{opacity:.55;}.gm.hl{box-shadow:0 0 0 2px var(--accent);}
 .gm-ind{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;}
-.aprobada .gm-ind{background:var(--green);}
-.disponible .gm-ind{background:var(--accent);}
-.bloqueada .gm-ind{background:var(--text3);}
+.aprobada .gm-ind{background:var(--green);}.disponible .gm-ind{background:var(--accent);}.bloqueada .gm-ind{background:var(--text3);}
 .gm-code{font-family:var(--mono);font-size:8px;color:var(--text3);}
 .gm-name{font-size:10px;font-weight:600;line-height:1.3;margin-top:1px;color:var(--text);}
 .gm-uc{font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:2px;}
-
-/* ══════════════════════════════════════════
-   ADMIN VIEW
-══════════════════════════════════════════ */
 #view-admin{display:none;padding:16px;flex-direction:column;gap:16px;}
 #view-admin.active{display:flex;}
-
-.admin-header{
-  background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(79,142,247,.08));
-  border:1px solid rgba(167,139,250,.2);border-radius:var(--radius);
-  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
-}
-.admin-header h2{font-size:15px;font-weight:800;color:var(--accent3);display:flex;align-items:center;gap:8px;}
-.admin-header p{font-size:12px;color:var(--text2);margin-top:3px;}
-
-/* Admin grid cards */
-.admin-grid{display:grid;grid-template-columns:1fr;gap:14px;}
-
-/* Materia cards in admin */
-.admin-mat-list{display:flex;flex-direction:column;gap:6px;max-height:450px;overflow-y:auto;padding:2px;}
-.admin-mat-item{
-  display:flex;align-items:center;gap:10px;padding:11px 13px;
-  border-radius:8px;border:1px solid var(--border);background:var(--bg3);
-  transition:all .15s;
-}
-.admin-mat-item:hover{border-color:var(--border2);}
+.admin-bar{background:linear-gradient(135deg,rgba(34,211,165,.07),rgba(79,142,247,.05));border:1px solid rgba(34,211,165,.2);border-radius:var(--radius);padding:14px 16px;}
+.admin-bar h2{font-size:14px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.admin-bar p{font-size:12px;color:var(--text2);}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.admin-mat-list{display:flex;flex-direction:column;gap:6px;max-height:480px;overflow-y:auto;padding:2px;}
+.ami{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);}
+.ami.inactiva{opacity:.4;}
 .ami-info{flex:1;min-width:0;}
 .ami-name{font-size:12px;font-weight:600;color:var(--text);}
 .ami-meta{font-size:10px;color:var(--text2);font-family:var(--mono);margin-top:2px;}
-.ami-actions{display:flex;gap:5px;flex-shrink:0;}
-
-/* MODAL */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
-  z-index:500;align-items:center;justify-content:center;padding:16px;
-  backdrop-filter:blur(4px);
-}
-.modal-overlay.open{display:flex;}
-.modal{
-  background:var(--bg2);border:1px solid var(--border2);border-radius:14px;
-  padding:24px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;
-  animation:modalIn .2s ease;
-}
-@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.modal h3{font-size:16px;font-weight:800;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
-
-/* FORM FIELDS */
-.form-row{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px;}
-.form-group{display:flex;flex-direction:column;gap:5px;}
-.form-group label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;}
-.form-group input,.form-group select,.form-group textarea{
-  background:var(--bg3);border:1px solid var(--border);border-radius:7px;
-  padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;
-  transition:border-color .15s;min-height:var(--touch-min);width:100%;
-}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);}
-.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3);}
-.form-group textarea{min-height:80px;resize:vertical;}
-.form-group .hint{font-size:11px;color:var(--text3);margin-top:3px;}
-
-/* PREREQ CHIPS */
-.chip-container{display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:var(--bg4);border-radius:7px;border:1px solid var(--border);min-height:44px;}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 10px;
-  border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:600;
-  background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);color:var(--accent);}
-.chip-rm{cursor:pointer;opacity:.6;font-size:13px;line-height:1;}
-.chip-rm:hover{opacity:1;color:var(--red);}
-
-/* SETUP PANEL */
-.setup-panel{
-  background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(248,113,113,.06));
-  border:1px solid rgba(251,191,36,.25);border-radius:var(--radius);padding:20px;
-}
-.setup-panel h3{font-size:15px;font-weight:800;color:var(--yellow);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-.setup-panel p{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
-.setup-steps{counter-reset:step;}
-.setup-step{
-  display:flex;align-items:flex-start;gap:12px;padding:10px 0;
-  border-top:1px solid var(--border);font-size:12px;color:var(--text2);counter-increment:step;
-}
-.setup-step::before{
-  content:counter(step);min-width:22px;height:22px;border-radius:50%;
-  background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;
-}
-.setup-step code{background:var(--bg4);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--accent2);}
-.config-input-row{display:flex;gap:8px;margin-bottom:10px;}
-.config-input-row input{
-  flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;
-  padding:9px 12px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;
-  transition:border-color .15s;
-}
-.config-input-row input:focus{border-color:var(--accent);}
-.config-input-row input::placeholder{color:var(--text3);}
-
-/* IMPORT PANEL */
-.import-zone{
-  border:2px dashed var(--border2);border-radius:var(--radius);padding:24px;
-  text-align:center;cursor:pointer;transition:all .2s;
-}
-.import-zone:hover,.import-zone.drag{border-color:var(--accent);background:rgba(79,142,247,.04);}
-.import-zone p{font-size:13px;color:var(--text2);margin-top:8px;}
-.import-zone .ico{font-size:32px;}
-
-/* BUTTONS */
-.btn{
-  padding:9px 15px;border:1px solid var(--border);border-radius:7px;
-  font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;
-  transition:all .15s;background:var(--bg3);color:var(--text2);
-  display:inline-flex;align-items:center;gap:6px;min-height:var(--touch-min);
-}
+.ami-btns{display:flex;gap:5px;flex-shrink:0;}
+.admin-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.admin-filters select,.admin-filters input{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:22px;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;animation:mIn .2s ease;}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal h3{font-size:15px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.fg label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;}
+.fg input,.fg select{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .15s;width:100%;min-height:var(--touch-min);}
+.fg input:focus,.fg select:focus{border-color:var(--accent);}
+.fg input::placeholder{color:var(--text3);}
+.fg .hint{font-size:11px;color:var(--text3);}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.chips-area{display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:var(--bg4);border-radius:7px;border:1px solid var(--border);min-height:44px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px 4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:600;background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);color:var(--accent);}
+.chip-x{cursor:pointer;opacity:.6;font-size:13px;line-height:1;}.chip-x:hover{opacity:1;color:var(--red);}
+.add-prereq-row{display:flex;gap:6px;margin-bottom:7px;}
+.add-prereq-row select{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;}
+.btn{padding:9px 15px;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:var(--bg3);color:var(--text2);display:inline-flex;align-items:center;gap:6px;min-height:var(--touch-min);}
 .btn:hover{border-color:var(--accent);color:var(--text);}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-.btn.primary:hover{background:#3b78e7;}
-.btn.success{background:var(--green);border-color:var(--green);color:#0a1a14;}
-.btn.success:hover{background:#1ab89a;}
-.btn.danger{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:var(--red);}
-.btn.danger:hover{background:rgba(248,113,113,.25);}
-.btn.excel{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:#4ade80;}
-.btn.purple{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.35);color:var(--accent3);}
-.btn.yellow{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:var(--yellow);}
-.btn.sm{padding:5px 10px;font-size:11px;min-height:30px;}
-.btn:disabled{opacity:.4;cursor:not-allowed;}
-
-/* STUDENT FORM */
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;}.btn.pri:hover{background:#3b78e7;}
+.btn.suc{background:var(--green);border-color:var(--green);color:#0a1a14;justify-content:center;}.btn.suc:hover{background:#1ab89a;}
+.btn.dan{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:var(--red);}
+.btn.exc{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:#4ade80;}
+.btn.pur{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3);color:var(--accent3);}
+.btn.ylw{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:var(--yellow);}
+.btn.sm{padding:5px 10px;font-size:11px;min-height:30px;}.btn:disabled{opacity:.4;cursor:not-allowed;}
 .student-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;}
-.form-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px;}
-.form-field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .15s;min-height:var(--touch-min);}
-.form-field input:focus{border-color:var(--accent);}
-.form-field input::placeholder{color:var(--text3);}
-
-/* TOAST */
-.toast-container{position:fixed;bottom:16px;left:12px;right:12px;display:flex;flex-direction:column;gap:7px;z-index:999;pointer-events:none;}
+.sf-field label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;display:block;margin-bottom:4px;}
+.sf-field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .15s;min-height:var(--touch-min);}
+.sf-field input:focus{border-color:var(--accent);}.sf-field input::placeholder{color:var(--text3);}
+.toast-wrap{position:fixed;bottom:16px;left:12px;right:12px;display:flex;flex-direction:column;gap:7px;z-index:999;pointer-events:none;}
 .toast{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;width:100%;box-shadow:0 8px 24px rgba(0,0,0,.5);animation:slideUp .25s ease;display:flex;align-items:flex-start;gap:9px;}
-.toast.err{border-color:rgba(248,113,113,.4);}
-.toast.ok{border-color:rgba(34,211,165,.4);}
-.toast.warn{border-color:rgba(251,191,36,.4);}
-.t-icon{font-size:16px;flex-shrink:0;}
-.t-msg strong{display:block;font-size:13px;color:var(--text);}
-.t-msg small{font-size:12px;color:var(--text2);}
+.toast.err{border-color:rgba(248,113,113,.4);}.toast.ok{border-color:rgba(34,211,165,.4);}.toast.warn{border-color:rgba(251,191,36,.4);}
+.t-icon{font-size:16px;flex-shrink:0;}.t-msg strong{display:block;font-size:13px;color:var(--text);}.t-msg small{font-size:12px;color:var(--text2);}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-
-/* LOADING STATE */
-.loading-overlay{
-  position:fixed;inset:0;background:rgba(7,8,15,.85);z-index:400;
-  display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-}
-.loading-overlay.show{display:flex;}
+.loading{position:fixed;inset:0;background:rgba(7,8,15,.88);z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.loading.show{display:flex;}
 .spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loading-text{font-size:13px;color:var(--text2);font-family:var(--mono);}
-
-/* ══════════════════════════════════════════
-   DESKTOP OVERRIDES ≥ 768px
-══════════════════════════════════════════ */
+.loading-txt{font-size:13px;color:var(--text2);font-family:var(--mono);}
 @media(min-width:768px){
   .app{height:100vh;overflow:hidden;display:grid;grid-template-rows:auto auto auto 1fr;}
-  body{overflow:hidden;}
-  .tabs{top:66px;}
+  body{overflow:hidden;}.tabs{top:66px;}
   .stats-bar{grid-template-columns:repeat(6,1fr);}
-  .stat{border-bottom:none;}
-  .stat:nth-child(3n){border-right:1px solid var(--border);}
-  .stat:last-child{border-right:none;}
+  .stat{border-bottom:none;}.stat:nth-child(3n){border-right:1px solid var(--border);}.stat:last-child{border-right:none;}
   .view.active{display:flex;flex:1;overflow:hidden;}
   #view-pensum.active{gap:0;}
   .sidebar{width:320px;min-width:320px;border-right:1px solid var(--border);border-bottom:none;display:flex;flex-direction:column;overflow:hidden;}
@@ -455,54 +218,35 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   .ring-stat-row{background:transparent;border:none;padding:0;gap:10px;}
   .next-sem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .student-form{display:grid;grid-template-columns:repeat(4,1fr);align-items:end;}
-  .toast-container{left:auto;right:20px;bottom:20px;width:340px;}
+  .toast-wrap{left:auto;right:20px;bottom:20px;width:340px;}
   #view-mapa.active{display:flex;overflow:auto;}
   #view-admin.active{display:flex;overflow-y:auto;padding:24px;gap:18px;flex-direction:column;}
-  .admin-grid{grid-template-columns:1fr 1fr;}
-  .form-row{grid-template-columns:1fr 1fr;}
-  .header{padding:14px 24px;}
-  .tabs{padding:0 24px;}
-  .logo-icon{width:42px;height:42px;font-size:20px;}
-  .logo h1{font-size:17px;}
+  .header{padding:14px 24px;}.tabs{padding:0 24px;}
+  .logo-icon{width:42px;height:42px;font-size:20px;}.logo h1{font-size:17px;}
 }
-@media(min-width:1200px){
-  .sidebar{width:360px;min-width:360px;}
-  .admin-grid{grid-template-columns:1fr 1fr 1fr;}
-}
+@media(min-width:1200px){.sidebar{width:360px;min-width:360px;}}
 </style>
 </head>
 <body>
 <div class="app">
-
-<!-- HEADER -->
 <header class="header">
   <div class="logo">
     <div class="logo-icon">🎓</div>
-    <div>
-      <h1>Pensum · Ing. Sistemas</h1>
-      <p>UNEFA Núcleo Lara · Plan 2010</p>
-    </div>
+    <div><h1>Pensum · Ing. Sistemas</h1><p>UNEFA Núcleo Lara · Plan 2010</p></div>
   </div>
   <div class="header-actions">
-    <div class="fb-status connecting" id="fb-status">
-      <div class="fb-dot pulse"></div>
-      <span id="fb-status-text">Conectando…</span>
-    </div>
-    <button class="btn excel" onclick="exportExcel()">📊 Excel</button>
-    <button class="btn yellow" onclick="desmarcarTodas()">☐ Desmarcar</button>
-    <button class="btn danger" onclick="resetAll()">↺ Reiniciar</button>
+    <div class="fb-badge connecting" id="fb-badge"><div class="fb-dot pulse" id="fb-dot"></div><span id="fb-txt">Conectando Firebase…</span></div>
+    <button class="btn exc" onclick="exportExcel()">📊 Excel</button>
+    <button class="btn ylw" onclick="desmarcarTodas()">☐ Desmarcar todas</button>
+    <button class="btn dan" onclick="resetAll()">↺ Reiniciar</button>
   </div>
 </header>
-
-<!-- TABS -->
 <nav class="tabs">
-  <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg-pensum">0</span></div>
+  <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg">0</span></div>
   <div class="tab" onclick="setTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
   <div class="tab" onclick="setTab('mapa')" id="tab-mapa">🗺 Mapa</div>
-  <div class="tab" onclick="setTab('admin')" id="tab-admin">⚙️ Administrar <span class="tab-badge" style="background:rgba(167,139,250,.15);color:var(--accent3);">DB</span></div>
+  <div class="tab" onclick="setTab('admin')" id="tab-admin">⚙️ Administrar <span class="tab-badge adm">DB</span></div>
 </nav>
-
-<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-val c-green" id="st-ap">0</div><div class="stat-label">Aprobadas</div></div>
   <div class="stat"><div class="stat-val c-blue" id="st-disp">0</div><div class="stat-label">Disponibles</div></div>
@@ -511,14 +255,9 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   <div class="stat"><div class="stat-val c-purple" id="st-uc">0</div><div class="stat-label">UC Aprob.</div></div>
   <div class="stat"><div class="stat-val c-gray" id="st-falta">224</div><div class="stat-label">UC Faltan</div></div>
 </div>
-
-<!-- ══ PENSUM VIEW ══ -->
 <div class="view active" id="view-pensum">
   <div class="sidebar">
-    <div class="sb-head">
-      <h2>Materias del Pensum</h2>
-      <div class="sb-search"><input type="text" id="s-search" placeholder="Buscar por nombre o código…" oninput="renderList()"></div>
-    </div>
+    <div class="sb-head"><h2>Materias del Pensum</h2><div class="sb-search"><input type="text" id="s-search" placeholder="Buscar por nombre o código…" oninput="renderList()"></div></div>
     <div class="sb-filters" id="sb-filters"></div>
     <div class="mat-list" id="mat-list"></div>
   </div>
@@ -527,14 +266,12 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
     <div id="d-content" style="display:none"></div>
   </div>
 </div>
-
-<!-- ══ DASHBOARD VIEW ══ -->
 <div class="view" id="view-dashboard">
   <div class="student-form">
-    <div class="form-field"><label>Nombre y Apellido</label><input id="f-nombre" placeholder="Ej: Juan Pérez" oninput="saveStudent()"></div>
-    <div class="form-field"><label>Cédula</label><input id="f-cedula" placeholder="V-12345678" oninput="saveStudent()"></div>
-    <div class="form-field"><label>Sección</label><input id="f-seccion" placeholder="IS-2A" oninput="saveStudent()"></div>
-    <div><button class="btn excel" style="width:100%" onclick="exportExcel()">📊 Exportar Excel</button></div>
+    <div class="sf-field"><label>Nombre y Apellido</label><input id="f-nombre" placeholder="Ej: Juan Pérez" oninput="saveStudent()"></div>
+    <div class="sf-field"><label>Cédula</label><input id="f-cedula" placeholder="V-12345678" oninput="saveStudent()"></div>
+    <div class="sf-field"><label>Sección</label><input id="f-seccion" placeholder="IS-2A" oninput="saveStudent()"></div>
+    <div><button class="btn exc" style="width:100%;justify-content:center;" onclick="exportExcel()">📊 Exportar Excel</button></div>
   </div>
   <div class="dcard">
     <h3>🎯 Progreso Académico</h3>
@@ -542,11 +279,8 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
       <div class="ring-container">
         <svg viewBox="0 0 130 130" width="130" height="130">
           <circle cx="65" cy="65" r="55" fill="none" stroke="var(--bg4)" stroke-width="12"/>
-          <circle id="ring-circle" cx="65" cy="65" r="55" fill="none" stroke="url(#rgrad)" stroke-width="12"
-            stroke-linecap="round" stroke-dasharray="345.4" stroke-dashoffset="345.4" style="transition:stroke-dashoffset .7s ease"/>
-          <defs><linearGradient id="rgrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent2)"/>
-          </linearGradient></defs>
+          <circle id="ring-circle" cx="65" cy="65" r="55" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="345.4" stroke-dashoffset="345.4" style="transition:stroke-dashoffset .7s ease"/>
+          <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent2)"/></linearGradient></defs>
         </svg>
         <div class="ring-text"><div class="ring-pct" id="ring-pct">0%</div><div class="ring-sub">del título</div></div>
       </div>
@@ -559,1009 +293,840 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
       </div>
     </div>
   </div>
-  <div class="dcard">
-    <h3>📈 UC por Semestre</h3>
-    <div class="chart-bars" id="chart-bars"></div>
-    <div class="chart-legend">
-      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>Aprobadas</div>
-      <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--bg4)"></div>Pendientes</div>
-    </div>
-  </div>
+  <div class="dcard"><h3>📈 UC por Semestre</h3><div class="chart-bars" id="chart-bars"></div><div class="chart-legend"><div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>Aprobadas</div><div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--bg4)"></div>Pendientes</div></div></div>
   <div class="dcard"><h3>📊 Avance por Semestre</h3><div id="sem-bars"></div></div>
-  <div class="dcard"><h3>🔮 Próximo Período</h3><div class="next-sem-grid" id="next-sem-grid"></div></div>
+  <div class="dcard"><h3>🔮 Próximo Período de Inscripción</h3><div class="next-sem-grid" id="next-sem-grid"></div></div>
 </div>
-
-<!-- ══ MAPA VIEW ══ -->
 <div class="view" id="view-mapa">
-  <div style="padding:10px 16px;font-size:11px;color:var(--text2);font-family:var(--mono);border-bottom:1px solid var(--border);background:var(--bg2);">← Desliza para ver todos los semestres</div>
+  <div style="padding:10px 16px;font-size:11px;color:var(--text2);font-family:var(--mono);border-bottom:1px solid var(--border);background:var(--bg2);">← Desliza horizontalmente para ver todos los semestres</div>
   <div class="pensum-grid" id="pensum-grid"></div>
 </div>
-
-<!-- ══ ADMIN VIEW ══ -->
 <div class="view" id="view-admin">
-
-  <!-- Setup / Configuración Firebase -->
-  <div class="setup-panel" id="setup-panel">
-    <h3>🔧 Configuración Firebase</h3>
-    <p>Conecta tu Realtime Database para que el pensum se actualice en tiempo real desde la nube. Una vez configurado, podrás agregar, editar y mover materias sin tocar el código.</p>
-    <div class="config-input-row">
-      <input type="text" id="cfg-url" placeholder="https://TU-PROYECTO-default-rtdb.firebaseio.com" style="font-family:var(--mono);font-size:12px;">
-      <button class="btn primary" onclick="guardarConfig()">Guardar URL</button>
-    </div>
-    <div class="setup-steps">
-      <div class="setup-step">Ve a <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">console.firebase.google.com</a> y crea un proyecto</div>
-      <div class="setup-step">Activa <strong>Realtime Database</strong> → Crear base de datos → Modo de prueba</div>
-      <div class="setup-step">Copia la URL del database (ej: <code>https://mi-proyecto-rtdb.firebaseio.com</code>)</div>
-      <div class="setup-step">En <strong>Reglas</strong>, pega: <code>{ "rules": { ".read": true, ".write": true } }</code> (solo para pruebas)</div>
-      <div class="setup-step">Pega la URL arriba y haz clic en <strong>Guardar URL</strong>, luego recarga la página</div>
-      <div class="setup-step">En el panel de Administración haz clic en <strong>📥 Importar Pensum Base</strong> para cargar todas las materias</div>
-    </div>
+  <div class="admin-bar">
+    <h2>⚙️ Administrador del Pensum</h2>
+    <p id="admin-info-txt">Conectando a Firebase…</p>
   </div>
-
-  <!-- Acciones rápidas -->
   <div class="dcard">
-    <h3>⚡ Acciones Rápidas</h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn primary" onclick="abrirModalMateria(null)">➕ Nueva Materia</button>
-      <button class="btn purple" onclick="importarPensumBase()">📥 Importar Pensum Base</button>
-      <button class="btn excel" onclick="exportarPensumJSON()">📤 Exportar JSON</button>
-      <button class="btn" onclick="recargarDesdeFB()">🔄 Recargar desde Firebase</button>
+    <h3>⚡ Acciones</h3>
+    <div class="admin-actions">
+      <button class="btn pri" onclick="abrirModal(null)">➕ Nueva Materia</button>
+      <button class="btn pur" onclick="importarPensum()">📥 Importar Pensum Base</button>
+      <button class="btn exc" onclick="exportarJSON()">📤 Exportar JSON</button>
     </div>
-    <div id="admin-fb-info" style="margin-top:12px;font-size:12px;color:var(--text2);font-family:var(--mono);"></div>
   </div>
-
-  <!-- Lista de materias administrable -->
-  <div class="dcard" style="flex:1;display:flex;flex-direction:column;min-height:0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-      <h3 style="margin:0;">📋 Materias en la Base de Datos</h3>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <select id="admin-filter-sem" onchange="renderAdminList()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);">
-          <option value="0">Todos los semestres</option>
-          <option value="1">Semestre 1</option><option value="2">Semestre 2</option>
-          <option value="3">Semestre 3</option><option value="4">Semestre 4</option>
-          <option value="5">Semestre 5</option><option value="6">Semestre 6</option>
-          <option value="7">Semestre 7</option><option value="8">Semestre 8</option>
-          <option value="9">Semestre 9</option>
-        </select>
-        <input type="text" id="admin-search" placeholder="Buscar…" oninput="renderAdminList()"
-          style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;width:130px;">
-      </div>
+  <div class="dcard" style="flex:1;display:flex;flex-direction:column;">
+    <h3 style="margin-bottom:10px;">📋 Materias en Firebase</h3>
+    <div class="admin-filters">
+      <select id="adm-sem" onchange="renderAdmin()">
+        <option value="0">Todos los semestres</option>
+        <option value="1">Semestre 1</option><option value="2">Semestre 2</option><option value="3">Semestre 3</option>
+        <option value="4">Semestre 4</option><option value="5">Semestre 5</option><option value="6">Semestre 6</option>
+        <option value="7">Semestre 7</option><option value="8">Semestre 8</option><option value="9">Semestre 9</option>
+      </select>
+      <input type="text" id="adm-q" placeholder="Buscar materia…" oninput="renderAdmin()" style="width:150px;">
     </div>
-    <div class="admin-mat-list" id="admin-mat-list"></div>
+    <div class="admin-mat-list" id="admin-list"></div>
   </div>
 </div>
-
-</div><!-- /app -->
-
-<!-- ══ MODAL: AGREGAR / EDITAR MATERIA ══ -->
-<div class="modal-overlay" id="modal-materia">
+</div>
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)cerrarModal()">
   <div class="modal">
-    <h3 id="modal-title">➕ Nueva Materia</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Código *</label>
-        <input type="text" id="m-id" placeholder="Ej: MAT-21215" style="text-transform:uppercase">
-        <span class="hint">Identificador único (no se puede cambiar después)</span>
-      </div>
-      <div class="form-group">
-        <label>Semestre *</label>
-        <select id="m-sem">
-          <option value="1">Semestre 1</option><option value="2">Semestre 2</option>
-          <option value="3">Semestre 3</option><option value="4">Semestre 4</option>
-          <option value="5">Semestre 5</option><option value="6">Semestre 6</option>
-          <option value="7">Semestre 7</option><option value="8">Semestre 8</option>
-          <option value="9">Semestre 9</option>
-        </select>
-      </div>
+    <h3 id="modal-titulo">➕ Nueva Materia</h3>
+    <div class="form-2col">
+      <div class="fg"><label>Código *</label><input type="text" id="m-id" placeholder="Ej: MAT-21215" style="text-transform:uppercase"><span class="hint">Identificador único — no se puede cambiar</span></div>
+      <div class="fg"><label>Semestre *</label><select id="m-sem"><option value="1">Semestre 1</option><option value="2">Semestre 2</option><option value="3">Semestre 3</option><option value="4">Semestre 4</option><option value="5">Semestre 5</option><option value="6">Semestre 6</option><option value="7">Semestre 7</option><option value="8">Semestre 8</option><option value="9">Semestre 9</option></select></div>
     </div>
-    <div class="form-row">
-      <div class="form-group" style="grid-column:1/-1">
-        <label>Nombre de la Asignatura *</label>
-        <input type="text" id="m-nombre" placeholder="Ej: Matemática I">
-      </div>
+    <div class="fg"><label>Nombre de la Asignatura *</label><input type="text" id="m-nombre" placeholder="Ej: Matemática I"></div>
+    <div class="form-2col">
+      <div class="fg"><label>Unidades de Crédito *</label><input type="number" id="m-uc" min="1" max="15" value="4"></div>
+      <div class="fg"><label>Tipo</label><select id="m-tipo"><option value="obligatoria">Obligatoria</option><option value="electiva_tecnica">Electiva Técnica</option><option value="electiva_no_tecnica">Electiva No Técnica</option><option value="grado">Trabajo de Grado / Pasantía</option></select></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Unidades de Crédito (UC) *</label>
-        <input type="number" id="m-uc" min="1" max="15" value="4">
-      </div>
-      <div class="form-group">
-        <label>Tipo</label>
-        <select id="m-tipo">
-          <option value="obligatoria">Obligatoria</option>
-          <option value="electiva_tecnica">Electiva Técnica</option>
-          <option value="electiva_no_tecnica">Electiva No Técnica</option>
-          <option value="grado">Trabajo de Grado / Pasantía</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:14px;">
+    <div class="fg">
       <label>Prelaciones (Prerequisitos)</label>
-      <div style="display:flex;gap:6px;margin-bottom:7px;">
-        <select id="prereq-select" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:12px;font-family:var(--mono);">
-          <option value="">— Seleccionar materia —</option>
-        </select>
-        <button class="btn sm primary" onclick="agregarPrereq()">+ Agregar</button>
-      </div>
-      <div class="chip-container" id="prereq-chips"></div>
-      <span class="hint">Las materias seleccionadas serán prerequisitos de esta asignatura</span>
+      <div class="add-prereq-row"><select id="prereq-sel"><option value="">— Seleccionar prelación —</option></select><button class="btn sm pri" onclick="addPrereq()">+ Agregar</button></div>
+      <div class="chips-area" id="prereq-chips"></div>
+      <span class="hint">Las materias aquí serán requisito previo para cursar esta asignatura</span>
     </div>
-    <div class="form-group" style="margin-bottom:0;">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" id="m-activa" checked style="width:16px;height:16px;accent-color:var(--green);">
-        <span style="font-size:12px;color:var(--text2);font-weight:400;text-transform:none;letter-spacing:0;">Materia activa (visible en el pensum)</span>
-      </label>
-    </div>
+    <div class="fg" style="margin-bottom:0;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" id="m-activa" checked style="width:16px;height:16px;accent-color:var(--green);">Materia activa (visible en el pensum del estudiante)</label></div>
     <div class="modal-footer">
       <button class="btn" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn danger sm" id="btn-eliminar" onclick="eliminarMateriaActual()" style="display:none;">🗑 Eliminar</button>
-      <button class="btn primary" onclick="guardarMateria()">💾 Guardar Cambios</button>
+      <button class="btn dan sm" id="btn-del" onclick="eliminarMateria()" style="display:none;">🗑 Eliminar</button>
+      <button class="btn pri" onclick="guardarMateria()">💾 Guardar en Firebase</button>
     </div>
   </div>
 </div>
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-txt" id="loading-txt">Cargando…</div></div>
+<div class="toast-wrap" id="toast-wrap"></div>
+"""
 
-<!-- LOADING -->
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loading-text">Cargando…</div>
-</div>
-
-<div class="toast-container" id="toast-wrap"></div>
-
+script = r"""
 <script>
-// ════════════════════════════════════════════════════
-// PENSUM BASE (fallback local si Firebase no conecta)
-// ════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// FIREBASE URL — pensum-sis-unefa
+// ═══════════════════════════════════════════════════════
+const FB_URL = 'https://pensum-sis-unefa-default-rtdb.firebaseio.com';
+
+// ═══════════════════════════════════════════════════════
+// PENSUM BASE (fallback local si Firebase tarda o falla)
+// ═══════════════════════════════════════════════════════
 const PENSUM_BASE = [
-  {id:'MAT-21212',nombre:'Dibujo',uc:2,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'MAT-21215',nombre:'Matemática I',uc:5,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'MAT-21524',nombre:'Geometría Analítica',uc:4,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'DIN-21113',nombre:'Defensa Integral Nación I',uc:3,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'QUF-23015',nombre:'Física I',uc:5,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'IDM-24113',nombre:'Inglés I',uc:3,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'ADG-25131',nombre:'Seminario I',uc:1,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'ADG-25123',nombre:'Hombre, Sociedad, Ciencia y Tecnología',uc:3,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'ADG-25132',nombre:'Educación Ambiental',uc:2,semestre:1,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'MAT-21225',nombre:'Matemática II',uc:5,semestre:2,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
-  {id:'MAT-21114',nombre:'Álgebra Lineal',uc:4,semestre:2,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
-  {id:'QUF-23025',nombre:'Física II',uc:5,semestre:2,prereqs:['QUF-23015','MAT-21215'],tipo:'obligatoria',activa:true},
-  {id:'QUF-22014',nombre:'Química General',uc:4,semestre:2,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'DIN-21123',nombre:'Defensa Integral Nación II',uc:3,semestre:2,prereqs:['DIN-21113'],tipo:'obligatoria',activa:true},
-  {id:'IDM-24123',nombre:'Inglés II',uc:3,semestre:2,prereqs:['IDM-24113'],tipo:'obligatoria',activa:true},
-  {id:'ADG-25141',nombre:'Seminario II',uc:1,semestre:2,prereqs:['ADG-25131'],tipo:'obligatoria',activa:true},
-  {id:'AGG-22313',nombre:'Sistemas Administrativos',uc:4,semestre:2,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'DEP-00101',nombre:'Deporte I',uc:2,semestre:2,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'MAT-21235',nombre:'Matemática III',uc:5,semestre:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
-  {id:'MAT-21414',nombre:'Probabilidades y Estadísticas',uc:4,semestre:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
-  {id:'SYC-22113',nombre:'Programación',uc:3,semestre:3,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
-  {id:'MAT-31214',nombre:'Lógica Matemática',uc:4,semestre:3,prereqs:['MAT-21114'],tipo:'obligatoria',activa:true},
-  {id:'MAT-31714',nombre:'Cálculo Numérico',uc:4,semestre:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
-  {id:'DIN-21133',nombre:'Defensa Integral Nación III',uc:3,semestre:3,prereqs:['DIN-21123'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32114',nombre:'Teoría de los Sistemas',uc:4,semestre:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32414',nombre:'Procesamiento de Datos',uc:4,semestre:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32225',nombre:'Lenguaje de Programación I',uc:5,semestre:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
-  {id:'AGL-30214',nombre:'Sistemas de Producción',uc:4,semestre:4,prereqs:['AGG-22313'],tipo:'obligatoria',activa:true},
-  {id:'DIN-21143',nombre:'Defensa Integral Nación IV',uc:3,semestre:4,prereqs:['DIN-21133'],tipo:'obligatoria',activa:true},
-  {id:'DEP-00102',nombre:'Deporte II',uc:2,semestre:4,prereqs:['DEP-00101'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32514',nombre:'Análisis de Sistemas',uc:4,semestre:5,prereqs:['SYC-32114'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32614',nombre:'Bases de Datos',uc:4,semestre:5,prereqs:['SYC-32414'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32235',nombre:'Lenguaje de Programación II',uc:5,semestre:5,prereqs:['SYC-32225'],tipo:'obligatoria',activa:true},
-  {id:'MAT-30925',nombre:'Investigación de Operaciones',uc:5,semestre:5,prereqs:['MAT-21414','MAT-31714'],tipo:'obligatoria',activa:true},
-  {id:'MAT-31114',nombre:'Teoría de Grafos',uc:4,semestre:5,prereqs:['MAT-31214'],tipo:'obligatoria',activa:true},
-  {id:'ELN-30514',nombre:'Circuitos Lógicos',uc:4,semestre:5,prereqs:['MAT-21114','QUF-23025'],tipo:'obligatoria',activa:true},
-  {id:'DIN-21153',nombre:'Defensa Integral Nación V',uc:3,semestre:5,prereqs:['DIN-21143'],tipo:'obligatoria',activa:true},
-  {id:'CAT-00101',nombre:'Cátedra I',uc:2,semestre:5,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'SYC-32524',nombre:'Diseño de Sistemas',uc:4,semestre:6,prereqs:['SYC-32514'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32245',nombre:'Lenguaje de Programación III',uc:5,semestre:6,prereqs:['SYC-32235'],tipo:'obligatoria',activa:true},
-  {id:'MAT-30935',nombre:'Optimización No Lineal',uc:5,semestre:6,prereqs:['MAT-30925'],tipo:'obligatoria',activa:true},
-  {id:'MAT-31414',nombre:'Procesos Estocásticos',uc:4,semestre:6,prereqs:['MAT-21414'],tipo:'obligatoria',activa:true},
-  {id:'SYC-30525',nombre:'Arquitectura del Computador',uc:5,semestre:6,prereqs:['ELN-30514'],tipo:'obligatoria',activa:true},
-  {id:'SYC-30834',nombre:'Sistemas Operativos',uc:4,semestre:6,prereqs:['SYC-32414'],tipo:'obligatoria',activa:true},
-  {id:'DIN-21163',nombre:'Defensa Integral Nación VI',uc:3,semestre:6,prereqs:['DIN-21153'],tipo:'obligatoria',activa:true},
-  {id:'CAT-00102',nombre:'Cátedra II',uc:2,semestre:6,prereqs:['CAT-00101'],tipo:'obligatoria',activa:true},
-  {id:'CUL-00101',nombre:'Cultura I',uc:2,semestre:6,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'SYC-32714',nombre:'Implantación de Sistemas',uc:4,semestre:7,prereqs:['SYC-32524'],tipo:'obligatoria',activa:true},
-  {id:'MAT-30945',nombre:'Simulación y Modelos',uc:5,semestre:7,prereqs:['MAT-30935','MAT-31414'],tipo:'obligatoria',activa:true},
-  {id:'SYC-31644',nombre:'Redes',uc:4,semestre:7,prereqs:['SYC-30525'],tipo:'obligatoria',activa:true},
-  {id:'ADG-30214',nombre:'Metodología de la Investigación',uc:4,semestre:7,prereqs:['MAT-21414'],tipo:'obligatoria',activa:true},
-  {id:'ADG-30224',nombre:'Gerencia de la Informática',uc:4,semestre:7,prereqs:['AGG-22313'],tipo:'obligatoria',activa:true},
-  {id:'ELEC-TEC-1',nombre:'Electiva Técnica I',uc:3,semestre:7,prereqs:[],tipo:'electiva_tecnica',activa:true},
-  {id:'ELEC-NOTEC-1',nombre:'Electiva No Técnica I',uc:3,semestre:7,prereqs:[],tipo:'electiva_no_tecnica',activa:true},
-  {id:'DIN-21173',nombre:'Defensa Integral Nación VII',uc:3,semestre:7,prereqs:['DIN-21163'],tipo:'obligatoria',activa:true},
-  {id:'SYC-32814',nombre:'Auditoría de Sistemas',uc:4,semestre:8,prereqs:['SYC-32714'],tipo:'obligatoria',activa:true},
-  {id:'MAT-31314',nombre:'Teoría de Decisiones',uc:4,semestre:8,prereqs:['MAT-30945'],tipo:'obligatoria',activa:true},
-  {id:'TTC-31154',nombre:'Teleprocesos',uc:4,semestre:8,prereqs:['SYC-31644'],tipo:'obligatoria',activa:true},
-  {id:'ELEC-TEC-2',nombre:'Electiva Técnica II',uc:3,semestre:8,prereqs:['ELEC-TEC-1'],tipo:'electiva_tecnica',activa:true},
-  {id:'ELEC-NOTEC-2',nombre:'Electiva No Técnica II',uc:3,semestre:8,prereqs:['ELEC-NOTEC-1'],tipo:'electiva_no_tecnica',activa:true},
-  {id:'CJU-37314',nombre:'Marco Legal para el Ejercicio de la Ingeniería',uc:4,semestre:8,prereqs:[],tipo:'obligatoria',activa:true},
-  {id:'DIN-21183',nombre:'Defensa Integral Nación VIII',uc:3,semestre:8,prereqs:['DIN-21173'],tipo:'obligatoria',activa:true},
-  {id:'CUL-00102',nombre:'Cultura II',uc:2,semestre:8,prereqs:['CUL-00101'],tipo:'obligatoria',activa:true},
-  {id:'PSI-30010',nombre:'Pasantía',uc:10,semestre:9,prereqs:['MAT-21215','MAT-21225','MAT-21235','SYC-22113','SYC-32225','SYC-32235','SYC-32245','SYC-32114','SYC-32514','SYC-32524','SYC-32714'],tipo:'grado',activa:true},
-  {id:'TGR-30010',nombre:'Trabajo Especial de Grado',uc:10,semestre:9,prereqs:['ADG-30214'],tipo:'grado',activa:true},
+  {id:'MAT-21212',nombre:'Dibujo',uc:2,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'MAT-21215',nombre:'Matemática I',uc:5,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'MAT-21524',nombre:'Geometría Analítica',uc:4,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'DIN-21113',nombre:'Defensa Integral Nación I',uc:3,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'QUF-23015',nombre:'Física I',uc:5,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'IDM-24113',nombre:'Inglés I',uc:3,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'ADG-25131',nombre:'Seminario I',uc:1,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'ADG-25123',nombre:'Hombre, Sociedad, Ciencia y Tecnología',uc:3,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'ADG-25132',nombre:'Educación Ambiental',uc:2,sem:1,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'MAT-21225',nombre:'Matemática II',uc:5,sem:2,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
+  {id:'MAT-21114',nombre:'Álgebra Lineal',uc:4,sem:2,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
+  {id:'QUF-23025',nombre:'Física II',uc:5,sem:2,prereqs:['QUF-23015','MAT-21215'],tipo:'obligatoria',activa:true},
+  {id:'QUF-22014',nombre:'Química General',uc:4,sem:2,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'DIN-21123',nombre:'Defensa Integral Nación II',uc:3,sem:2,prereqs:['DIN-21113'],tipo:'obligatoria',activa:true},
+  {id:'IDM-24123',nombre:'Inglés II',uc:3,sem:2,prereqs:['IDM-24113'],tipo:'obligatoria',activa:true},
+  {id:'ADG-25141',nombre:'Seminario II',uc:1,sem:2,prereqs:['ADG-25131'],tipo:'obligatoria',activa:true},
+  {id:'AGG-22313',nombre:'Sistemas Administrativos',uc:4,sem:2,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'DEP-00101',nombre:'Deporte I',uc:2,sem:2,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'MAT-21235',nombre:'Matemática III',uc:5,sem:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
+  {id:'MAT-21414',nombre:'Probabilidades y Estadísticas',uc:4,sem:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
+  {id:'SYC-22113',nombre:'Programación',uc:3,sem:3,prereqs:['MAT-21215'],tipo:'obligatoria',activa:true},
+  {id:'MAT-31214',nombre:'Lógica Matemática',uc:4,sem:3,prereqs:['MAT-21114'],tipo:'obligatoria',activa:true},
+  {id:'MAT-31714',nombre:'Cálculo Numérico',uc:4,sem:3,prereqs:['MAT-21225'],tipo:'obligatoria',activa:true},
+  {id:'DIN-21133',nombre:'Defensa Integral Nación III',uc:3,sem:3,prereqs:['DIN-21123'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32114',nombre:'Teoría de los Sistemas',uc:4,sem:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32414',nombre:'Procesamiento de Datos',uc:4,sem:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32225',nombre:'Lenguaje de Programación I',uc:5,sem:4,prereqs:['SYC-22113'],tipo:'obligatoria',activa:true},
+  {id:'AGL-30214',nombre:'Sistemas de Producción',uc:4,sem:4,prereqs:['AGG-22313'],tipo:'obligatoria',activa:true},
+  {id:'DIN-21143',nombre:'Defensa Integral Nación IV',uc:3,sem:4,prereqs:['DIN-21133'],tipo:'obligatoria',activa:true},
+  {id:'DEP-00102',nombre:'Deporte II',uc:2,sem:4,prereqs:['DEP-00101'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32514',nombre:'Análisis de Sistemas',uc:4,sem:5,prereqs:['SYC-32114'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32614',nombre:'Bases de Datos',uc:4,sem:5,prereqs:['SYC-32414'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32235',nombre:'Lenguaje de Programación II',uc:5,sem:5,prereqs:['SYC-32225'],tipo:'obligatoria',activa:true},
+  {id:'MAT-30925',nombre:'Investigación de Operaciones',uc:5,sem:5,prereqs:['MAT-21414','MAT-31714'],tipo:'obligatoria',activa:true},
+  {id:'MAT-31114',nombre:'Teoría de Grafos',uc:4,sem:5,prereqs:['MAT-31214'],tipo:'obligatoria',activa:true},
+  {id:'ELN-30514',nombre:'Circuitos Lógicos',uc:4,sem:5,prereqs:['MAT-21114','QUF-23025'],tipo:'obligatoria',activa:true},
+  {id:'DIN-21153',nombre:'Defensa Integral Nación V',uc:3,sem:5,prereqs:['DIN-21143'],tipo:'obligatoria',activa:true},
+  {id:'CAT-00101',nombre:'Cátedra I',uc:2,sem:5,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'SYC-32524',nombre:'Diseño de Sistemas',uc:4,sem:6,prereqs:['SYC-32514'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32245',nombre:'Lenguaje de Programación III',uc:5,sem:6,prereqs:['SYC-32235'],tipo:'obligatoria',activa:true},
+  {id:'MAT-30935',nombre:'Optimización No Lineal',uc:5,sem:6,prereqs:['MAT-30925'],tipo:'obligatoria',activa:true},
+  {id:'MAT-31414',nombre:'Procesos Estocásticos',uc:4,sem:6,prereqs:['MAT-21414'],tipo:'obligatoria',activa:true},
+  {id:'SYC-30525',nombre:'Arquitectura del Computador',uc:5,sem:6,prereqs:['ELN-30514'],tipo:'obligatoria',activa:true},
+  {id:'SYC-30834',nombre:'Sistemas Operativos',uc:4,sem:6,prereqs:['SYC-32414'],tipo:'obligatoria',activa:true},
+  {id:'DIN-21163',nombre:'Defensa Integral Nación VI',uc:3,sem:6,prereqs:['DIN-21153'],tipo:'obligatoria',activa:true},
+  {id:'CAT-00102',nombre:'Cátedra II',uc:2,sem:6,prereqs:['CAT-00101'],tipo:'obligatoria',activa:true},
+  {id:'CUL-00101',nombre:'Cultura I',uc:2,sem:6,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'SYC-32714',nombre:'Implantación de Sistemas',uc:4,sem:7,prereqs:['SYC-32524'],tipo:'obligatoria',activa:true},
+  {id:'MAT-30945',nombre:'Simulación y Modelos',uc:5,sem:7,prereqs:['MAT-30935','MAT-31414'],tipo:'obligatoria',activa:true},
+  {id:'SYC-31644',nombre:'Redes',uc:4,sem:7,prereqs:['SYC-30525'],tipo:'obligatoria',activa:true},
+  {id:'ADG-30214',nombre:'Metodología de la Investigación',uc:4,sem:7,prereqs:['MAT-21414'],tipo:'obligatoria',activa:true},
+  {id:'ADG-30224',nombre:'Gerencia de la Informática',uc:4,sem:7,prereqs:['AGG-22313'],tipo:'obligatoria',activa:true},
+  {id:'ELEC-TEC-1',nombre:'Electiva Técnica I',uc:3,sem:7,prereqs:[],tipo:'electiva_tecnica',activa:true},
+  {id:'ELEC-NOTEC-1',nombre:'Electiva No Técnica I',uc:3,sem:7,prereqs:[],tipo:'electiva_no_tecnica',activa:true},
+  {id:'DIN-21173',nombre:'Defensa Integral Nación VII',uc:3,sem:7,prereqs:['DIN-21163'],tipo:'obligatoria',activa:true},
+  {id:'SYC-32814',nombre:'Auditoría de Sistemas',uc:4,sem:8,prereqs:['SYC-32714'],tipo:'obligatoria',activa:true},
+  {id:'MAT-31314',nombre:'Teoría de Decisiones',uc:4,sem:8,prereqs:['MAT-30945'],tipo:'obligatoria',activa:true},
+  {id:'TTC-31154',nombre:'Teleprocesos',uc:4,sem:8,prereqs:['SYC-31644'],tipo:'obligatoria',activa:true},
+  {id:'ELEC-TEC-2',nombre:'Electiva Técnica II',uc:3,sem:8,prereqs:['ELEC-TEC-1'],tipo:'electiva_tecnica',activa:true},
+  {id:'ELEC-NOTEC-2',nombre:'Electiva No Técnica II',uc:3,sem:8,prereqs:['ELEC-NOTEC-1'],tipo:'electiva_no_tecnica',activa:true},
+  {id:'CJU-37314',nombre:'Marco Legal para el Ejercicio de la Ingeniería',uc:4,sem:8,prereqs:[],tipo:'obligatoria',activa:true},
+  {id:'DIN-21183',nombre:'Defensa Integral Nación VIII',uc:3,sem:8,prereqs:['DIN-21173'],tipo:'obligatoria',activa:true},
+  {id:'CUL-00102',nombre:'Cultura II',uc:2,sem:8,prereqs:['CUL-00101'],tipo:'obligatoria',activa:true},
+  {id:'PSI-30010',nombre:'Pasantía',uc:10,sem:9,prereqs:['MAT-21215','MAT-21225','MAT-21235','SYC-22113','SYC-32225','SYC-32235','SYC-32245','SYC-32114','SYC-32514','SYC-32524','SYC-32714'],tipo:'grado',activa:true},
+  {id:'TGR-30010',nombre:'Trabajo Especial de Grado',uc:10,sem:9,prereqs:['ADG-30214'],tipo:'grado',activa:true},
 ];
 
-// ════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════
-let MATERIAS    = [];   // activas, llenado desde Firebase o local
-let mMap        = {};
-let TOTAL_UC    = 224;
-let MAX_UC_SEM  = 33;
+// ═══════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════
+let MATERIAS=[],mMap={},TOTAL_UC=224,MAX_UC=33;
+let FB=null,fbOk=false,allFbMats=[];
+let editandoId=null,prereqsEdit=[];
+let aprobadas=new Set(JSON.parse(localStorage.getItem('un_ap')||'[]'));
+let student=JSON.parse(localStorage.getItem('un_st')||'{"nombre":"","cedula":"","seccion":""}');
+let historial=JSON.parse(localStorage.getItem('un_hi')||'{}');
+let selId=null,filterSem=0,currentTab='pensum';
 
-let aprobadas         = new Set(JSON.parse(localStorage.getItem('unefa_ap2') || '[]'));
-let student           = JSON.parse(localStorage.getItem('unefa_student2') || '{"nombre":"","cedula":"","seccion":""}');
-let historialMaterias = JSON.parse(localStorage.getItem('unefa_hist2') || '{}');
-let selId             = null;
-let filterSem         = 0;
-let currentTab        = 'pensum';
-let fbConectado       = false;
-let modoEdicion       = null;   // id de la materia que se está editando
-let prereqsEditando   = [];     // array de ids seleccionados en el modal
+// ═══════════════════════════════════════════════════════
+// CONEXIÓN FIREBASE AUTOMÁTICA AL CARGAR
+// ═══════════════════════════════════════════════════════
+async function conectarFirebase(){
+  setFbStatus('connecting','Conectando a Firebase…');
+  try{
+    const[appMod,dbMod]=await Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js')
+    ]);
+    const{initializeApp}=appMod;
+    const{getDatabase,ref,onValue,set,update,remove}=dbMod;
+    const app=initializeApp({databaseURL:FB_URL},'pensum-app');
+    const db=getDatabase(app);
+    FB={db,ref,onValue,set,update,remove};
 
-// ════════════════════════════════════════════════════
-// FIREBASE CALLBACKS
-// ════════════════════════════════════════════════════
-window.onFirebaseData = function(arr) {
-  fbConectado = true;
-  setFbStatus('connected', `Firebase · ${arr.length} materias`);
-  cargarMaterias(arr);
-};
+    // Escuchar materias EN TIEMPO REAL
+    FB.onValue(FB.ref(db,'pensum/materias'),snap=>{
+      const raw=snap.val()||{};
+      allFbMats=Object.values(raw);
+      const activas=allFbMats.filter(m=>m.activa!==false);
+      fbOk=true;
+      setFbStatus('connected',`Firebase ✓ · ${activas.length} materias`);
+      cargarMaterias(activas);
+      if(currentTab==='admin')renderAdmin();
+      updateAdminInfo();
+    },err=>{
+      setFbStatus('error','Error Firebase — modo local');
+      toast('err','No se pudo leer Firebase',err.message);
+      usarModoLocal();
+    });
 
-window.onFirebaseInfo = function(info) {
-  if (info.total_uc)            TOTAL_UC   = info.total_uc;
-  if (info.max_uc_por_semestre) MAX_UC_SEM = info.max_uc_por_semestre;
-};
+    // Escuchar config
+    FB.onValue(FB.ref(db,'pensum/info'),snap=>{
+      const i=snap.val()||{};
+      if(i.total_uc)TOTAL_UC=i.total_uc;
+      if(i.max_uc_por_semestre)MAX_UC=i.max_uc_por_semestre;
+    });
 
-// Fallback local si Firebase no carga en 4 segundos
-setTimeout(() => {
-  if (!fbConectado) {
-    setFbStatus('offline', 'Sin Firebase — modo local');
-    cargarMaterias(PENSUM_BASE);
-    toast('warn', '⚠️ Firebase no configurado', 'Usando pensum local. Ve a ⚙️ Administrar para configurar.');
+  }catch(e){
+    setFbStatus('error','Firebase no disponible — modo local');
+    toast('warn','Firebase no cargó',e.message+' — usando datos locales');
+    usarModoLocal();
   }
-}, 4000);
+}
 
-function cargarMaterias(arr) {
-  MATERIAS = arr.filter(m => m.activa !== false);
-  mMap = {};
-  MATERIAS.forEach(m => {
-    // Normalizar: Firebase puede guardar como 'semestre' o 'sem'
-    if (m.semestre && !m.sem) m.sem = m.semestre;
-    if (m.sem && !m.semestre) m.semestre = m.sem;
-    if (!m.prereqs) m.prereqs = [];
-    mMap[m.id] = m;
-  });
-  render();
-  if (currentTab === 'admin') renderAdminList();
+function usarModoLocal(){
+  allFbMats=PENSUM_BASE;
+  cargarMaterias(PENSUM_BASE);
   updateAdminInfo();
 }
 
-// ════════════════════════════════════════════════════
-// FIREBASE STATUS UI
-// ════════════════════════════════════════════════════
-function setFbStatus(state, text) {
-  const el = document.getElementById('fb-status');
-  const dot = el.querySelector('.fb-dot');
-  el.className = `fb-status ${state}`;
-  dot.className = `fb-dot${state === 'connecting' ? ' pulse' : ''}`;
-  document.getElementById('fb-status-text').textContent = text;
+function setFbStatus(state,txt){
+  const b=document.getElementById('fb-badge');
+  const d=document.getElementById('fb-dot');
+  b.className=`fb-badge ${state}`;
+  d.className=`fb-dot${state==='connecting'?' pulse':''}`;
+  document.getElementById('fb-txt').textContent=txt;
 }
 
-// ════════════════════════════════════════════════════
-// GUARDAR CONFIG FIREBASE URL
-// ════════════════════════════════════════════════════
-function guardarConfig() {
-  const url = document.getElementById('cfg-url').value.trim();
-  if (!url || !url.includes('firebaseio.com')) {
-    toast('err', 'URL inválida', 'Debe ser: https://TU-PROYECTO-default-rtdb.firebaseio.com');
-    return;
-  }
-  // La URL se guarda y se incrusta dinámicamente en el módulo Firebase
-  // El usuario debe pegarla manualmente en el firebaseConfig del <script type="module">
-  toast('warn', '📋 Próximo paso',
-    'Copia esta URL y pégala en el campo databaseURL del firebaseConfig dentro del <script type="module"> al inicio del HTML, luego recarga.');
-  navigator.clipboard?.writeText(url);
+function cargarMaterias(arr){
+  MATERIAS=arr.map(m=>({...m,sem:Number(m.sem||m.semestre||1)}));
+  mMap={};MATERIAS.forEach(m=>mMap[m.id]=m);
+  render();
 }
 
-function saveStudent() {
-  student.nombre  = document.getElementById('f-nombre').value;
-  student.cedula  = document.getElementById('f-cedula').value;
-  student.seccion = document.getElementById('f-seccion').value;
-  localStorage.setItem('unefa_student2', JSON.stringify(student));
+function saveStudent(){
+  student.nombre=document.getElementById('f-nombre').value;
+  student.cedula=document.getElementById('f-cedula').value;
+  student.seccion=document.getElementById('f-seccion').value;
+  localStorage.setItem('un_st',JSON.stringify(student));
 }
 
-// ════════════════════════════════════════════════════
-// LÓGICA DE PRELACIONES
-// ════════════════════════════════════════════════════
-function getEstado(id) {
-  if (aprobadas.has(id)) return 'aprobada';
+// ═══════════════════════════════════════════════════════
+// LÓGICA PRELACIONES
+// ═══════════════════════════════════════════════════════
+// ======================================================
+// 🔵 ESTADO REAL DE UNA MATERIA (CORREGIDO)
+// ======================================================
+function getEstado(id){
   const m = mMap[id];
-  if (!m || !m.prereqs || m.prereqs.length === 0) return 'disponible';
-  return m.prereqs.every(p => aprobadas.has(p)) ? 'disponible' : 'bloqueada';
-}
-function getFaltantes(id) { return (mMap[id]?.prereqs || []).filter(p => !aprobadas.has(p)); }
-function ucAp() { return [...aprobadas].reduce((s, id) => s + (mMap[id]?.uc || 0), 0); }
-function semCompleto(s) {
-  const mats = MATERIAS.filter(m => (m.sem || m.semestre) === s);
-  return mats.length > 0 && mats.every(m => aprobadas.has(m.id));
-}
-function semsCompletados() {
-  return [...new Set(MATERIAS.map(m => m.sem || m.semestre))].filter(s => semCompleto(s)).length;
+  if(!m) return 'bloqueada';
+
+  // Si está aprobada → aprobada
+  if(aprobadas.has(id)) return 'aprobada';
+
+  // Si está inactiva → bloqueada
+  if(m.activa === false) return 'bloqueada';
+
+  // Si no tiene prelaciones → disponible
+  if(!m.prereqs || m.prereqs.length === 0) return 'disponible';
+
+  // Si todas las prelaciones están aprobadas → disponible
+  const cumple = m.prereqs.every(p => aprobadas.has(p));
+  return cumple ? 'disponible' : 'bloqueada';
 }
 
-function toggleMateria(id) {
-  const e = getEstado(id);
-  if (e === 'bloqueada') {
-    const f = getFaltantes(id);
-    toast('err', `🔒 No puedes cursar: ${mMap[id].nombre}`, `Aprueba primero: ${f.map(x => mMap[x]?.nombre || x).join(', ')}`);
+// ======================================================
+// 🔵 MATERIAS DISPONIBLES REALES
+// ======================================================
+function materiasDisponibles(){
+  return MATERIAS.filter(m => getEstado(m.id) === 'disponible');
+}
+
+// ======================================================
+// 🔵 PRÓXIMO SEMESTRE REAL
+// ======================================================
+function calcularProximoSemestre(){
+  return MATERIAS
+    .filter(m => getEstado(m.id) === 'disponible')
+    .sort((a,b) => a.sem - b.sem);
+}
+
+function getFaltantes(id){return(mMap[id]?.prereqs||[]).filter(p=>!aprobadas.has(p));}
+function ucAp(){return[...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0);}
+function semCompleto(s){const ms=MATERIAS.filter(m=>m.sem===s);return ms.length>0&&ms.every(m=>aprobadas.has(m.id));}
+function semsCompletados(){return[...new Set(MATERIAS.map(m=>m.sem))].filter(s=>semCompleto(s)).length;}
+
+function toggleMateria(id){
+  const e=getEstado(id);
+  if(e==='bloqueada'){
+    const f=getFaltantes(id);
+    toast('err',`🔒 No puedes cursar: ${mMap[id].nombre}`,`Aprueba primero: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}`);
     return;
   }
-  if (aprobadas.has(id)) {
-    const dep = MATERIAS.filter(m => m.prereqs?.includes(id) && aprobadas.has(m.id));
-    if (dep.length) { toast('err', `No se puede desmarcar`, `Dependencias: ${dep.map(d => d.nombre).join(', ')}`); return; }
+  if(aprobadas.has(id)){
+    const dep=MATERIAS.filter(m=>(m.prereqs||[]).includes(id)&&aprobadas.has(m.id));
+    if(dep.length){toast('err','No se puede desmarcar',`Dependen: ${dep.map(d=>d.nombre).join(', ')}`);return;}
     aprobadas.delete(id);
-    toast('ok', `Desmarcada: ${mMap[id].nombre}`, '');
-  } else {
+    toast('ok',`Desmarcada: ${mMap[id].nombre}`,'');
+  }else{
     aprobadas.add(id);
-    const desbloq = MATERIAS.filter(mm => {
-      if (aprobadas.has(mm.id)) return false;
-      const antes = (mm.prereqs || []).filter(p => p !== id && !aprobadas.has(p));
-      return antes.length > 0 && (mm.prereqs || []).filter(p => !aprobadas.has(p)).length === 0;
+    const desb=MATERIAS.filter(mm=>{
+      if(aprobadas.has(mm.id))return false;
+      const ant=(mm.prereqs||[]).filter(p=>p!==id&&!aprobadas.has(p));
+      return ant.length>0&&(mm.prereqs||[]).filter(p=>!aprobadas.has(p)).length===0;
     });
-    toast('ok', `✓ ${mMap[id].nombre} (${mMap[id].uc} UC)`,
-      desbloq.length ? `Desbloqueaste: ${desbloq.map(d => d.nombre).join(', ')}` : '');
+    toast('ok',`✓ ${mMap[id].nombre} (${mMap[id].uc} UC)`,desb.length?`Desbloqueaste: ${desb.map(d=>d.nombre).join(', ')}`:'');
   }
-  save(); render();
-  if (selId) showDetail(selId);
+  save();render();if(selId)showDetail(selId);
 }
 
-function save() { localStorage.setItem('unefa_ap2', JSON.stringify([...aprobadas])); }
+function save(){localStorage.setItem('un_ap',JSON.stringify([...aprobadas]));}
 
-function resetAll() {
-  if (!confirm('¿Eliminar todo el progreso del estudiante?')) return;
-  aprobadas.clear(); historialMaterias = {}; save();
-  localStorage.setItem('unefa_hist2', '{}'); selId = null;
-  document.getElementById('d-empty').style.display = 'flex';
-  document.getElementById('d-content').style.display = 'none';
-  render(); toast('ok', 'Progreso reiniciado', '');
+function resetAll(){
+  if(!confirm('¿Eliminar todo el progreso del estudiante?'))return;
+  aprobadas.clear();historial={};save();
+  localStorage.setItem('un_hi','{}');selId=null;
+  document.getElementById('d-empty').style.display='flex';
+  document.getElementById('d-content').style.display='none';
+  render();toast('ok','Progreso reiniciado','');
 }
 
-function desmarcarTodas() {
-  const c = aprobadas.size;
-  if (!c) { toast('err', 'Sin materias aprobadas', ''); return; }
-  if (!confirm(`¿Desmarcar las ${c} materias aprobadas?`)) return;
-  aprobadas.clear(); save(); selId = null;
-  document.getElementById('d-empty').style.display = 'flex';
-  document.getElementById('d-content').style.display = 'none';
-  render(); toast('ok', `${c} materias desmarcadas`, '');
+function desmarcarTodas(){
+  const c=aprobadas.size;
+  if(!c){toast('err','Sin materias aprobadas','');return;}
+  if(!confirm(`¿Desmarcar las ${c} materias?`))return;
+  aprobadas.clear();save();selId=null;
+  document.getElementById('d-empty').style.display='flex';
+  document.getElementById('d-content').style.display='none';
+  render();toast('ok',`${c} materias desmarcadas`,'');
 }
 
-function cambiarHistorialMateria(id, estado) {
-  if (estado === 'nueva') delete historialMaterias[id]; else historialMaterias[id] = estado;
-  localStorage.setItem('unefa_hist2', JSON.stringify(historialMaterias));
-  render(); if (selId === id) showDetail(id);
+function cambiarHistorial(id,val){
+  if(val==='nueva')delete historial[id];else historial[id]=val;
+  localStorage.setItem('un_hi',JSON.stringify(historial));
+  render();if(selId===id)showDetail(id);
 }
 
-function aprobarSemestreCompleto(s) {
-  let marcadas = [], bloqueadas2 = [];
-  MATERIAS.filter(m => (m.sem || m.semestre) === s).forEach(m => {
-    if (aprobadas.has(m.id)) return;
-    const f = (m.prereqs || []).filter(p => !aprobadas.has(p));
-    if (!f.length) { aprobadas.add(m.id); marcadas.push(m.nombre); }
-    else bloqueadas2.push({ nombre: m.nombre, faltan: f.map(p => mMap[p]?.nombre || p) });
+function aprobarSemestre(s){
+  let ok=[],fail=[];
+  MATERIAS.filter(m=>m.sem===s).forEach(m=>{
+    if(aprobadas.has(m.id))return;
+    const f=(m.prereqs||[]).filter(p=>!aprobadas.has(p));
+    if(!f.length){aprobadas.add(m.id);ok.push(m.nombre);}
+    else fail.push({n:m.nombre,f:f.map(p=>mMap[p]?.nombre||p)});
   });
-  if (marcadas.length) { save(); render(); toast('ok', `S${s}: ${marcadas.length} marcadas`, marcadas.join(', ')); }
-  bloqueadas2.forEach(b => toast('err', `🔒 ${b.nombre}`, `Falta: ${b.faltan.join(', ')}`));
-  if (!marcadas.length && !bloqueadas2.length) toast('ok', `S${s} ya estaba completo`, '');
+  if(ok.length){save();render();toast('ok',`S${s}: ${ok.length} marcadas`,ok.join(', '));}
+  fail.forEach(b=>toast('err',`🔒 ${b.n}`,`Falta: ${b.f.join(', ')}`));
+  if(!ok.length&&!fail.length)toast('ok',`Semestre ${s} ya completo`,'');
 }
 
-// ════════════════════════════════════════════════════
-// RENDER PRINCIPAL
-// ════════════════════════════════════════════════════
-function render() {
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function render(){
   renderStats();
-  if (currentTab === 'pensum')    renderList();
-  if (currentTab === 'dashboard') renderDashboard();
-  if (currentTab === 'mapa')      renderMapa();
+  if(currentTab==='pensum')renderList();
+  if(currentTab==='dashboard')renderDashboard();
+  if(currentTab==='mapa')renderMapa();
 }
 
-function renderStats() {
-  let disp = 0, bloq = 0, nap = 0;
-  MATERIAS.forEach(m => {
-    const e = getEstado(m.id);
-    if (e === 'disponible' && !aprobadas.has(m.id)) disp++;
-    if (e === 'bloqueada') bloq++;
-    if (historialMaterias[m.id]?.startsWith('repite_') && !aprobadas.has(m.id)) nap++;
+function renderStats(){
+  let disp=0,bloq=0,nap=0;
+  MATERIAS.forEach(m=>{
+    const e=getEstado(m.id);
+    if(e==='disponible'&&!aprobadas.has(m.id))disp++;
+    if(e==='bloqueada')bloq++;
+    if(historial[m.id]?.startsWith('repite_')&&!aprobadas.has(m.id))nap++;
   });
-  const uca = ucAp(), ucf = Math.max(0, TOTAL_UC - uca);
-  document.getElementById('st-ap').textContent    = aprobadas.size;
-  document.getElementById('st-disp').textContent  = disp;
-  document.getElementById('st-bloq').textContent  = bloq;
-  document.getElementById('st-nap').textContent   = nap;
-  document.getElementById('st-uc').textContent    = uca;
-  document.getElementById('st-falta').textContent = ucf;
-  document.getElementById('tbdg-pensum').textContent = aprobadas.size;
+  const uca=ucAp();
+  document.getElementById('st-ap').textContent=aprobadas.size;
+  document.getElementById('st-disp').textContent=disp;
+  document.getElementById('st-bloq').textContent=bloq;
+  document.getElementById('st-nap').textContent=nap;
+  document.getElementById('st-uc').textContent=uca;
+  document.getElementById('st-falta').textContent=Math.max(0,TOTAL_UC-uca);
+  document.getElementById('tbdg').textContent=aprobadas.size;
 }
 
-function renderFilters() {
-  const c = document.getElementById('sb-filters');
-  c.innerHTML = '';
-  [{v:0,t:'TODOS'}, ...[1,2,3,4,5,6,7,8,9].map(s => ({v:s, t:`S${s}`}))].forEach(b => {
-    const btn = document.createElement('div');
-    btn.className = `f-btn ${filterSem === b.v ? 'active' : ''}`;
-    btn.textContent = b.t;
-    btn.onclick = () => { filterSem = b.v; renderFilters(); renderList(); };
+function renderFilters(){
+  const c=document.getElementById('sb-filters');c.innerHTML='';
+  [{v:0,t:'TODOS'},...[1,2,3,4,5,6,7,8,9].map(s=>({v:s,t:`S${s}`}))].forEach(b=>{
+    const btn=document.createElement('div');
+    btn.className=`f-btn${filterSem===b.v?' active':''}`;
+    btn.textContent=b.t;
+    btn.onclick=()=>{filterSem=b.v;renderFilters();renderList();};
     c.appendChild(btn);
   });
-  if (filterSem > 0) {
-    const btn = document.createElement('div');
-    btn.className = 'f-btn';
-    btn.style.cssText = 'background:var(--green);border-color:var(--green);color:#0a1a14;margin-left:4px;';
-    btn.textContent = `✓ S${filterSem} Liso`;
-    btn.onclick = () => aprobarSemestreCompleto(filterSem);
+  if(filterSem>0){
+    const btn=document.createElement('div');
+    btn.className='f-btn';
+    btn.style.cssText='background:var(--green);border-color:var(--green);color:#0a1a14;margin-left:4px;';
+    btn.textContent=`✓ S${filterSem} Liso`;
+    btn.onclick=()=>aprobarSemestre(filterSem);
     c.appendChild(btn);
   }
 }
 
-function renderList() {
+function renderList(){
   renderFilters();
-  const q = document.getElementById('s-search').value.toLowerCase();
-  const items = MATERIAS.filter(m => {
-    const s = m.sem || m.semestre;
-    if (filterSem > 0 && s !== filterSem) return false;
-    if (q && !m.nombre.toLowerCase().includes(q) && !m.id.toLowerCase().includes(q)) return false;
+  const q=document.getElementById('s-search').value.toLowerCase();
+  const items=MATERIAS.filter(m=>{
+    if(filterSem>0&&m.sem!==filterSem)return false;
+    if(q&&!m.nombre.toLowerCase().includes(q)&&!m.id.toLowerCase().includes(q))return false;
     return true;
   });
-  const eLabel = { aprobada: '✓ Aprobada', disponible: 'Disponible', bloqueada: 'Bloqueada' };
-  document.getElementById('mat-list').innerHTML = items.map(m => {
-    const e = getEstado(m.id), s = m.sem || m.semestre;
-    return `<div class="mat-item st-${e}${selId === m.id ? ' sel' : ''}" onclick="handleItemClick('${m.id}')">
-      <div class="mat-cb" onclick="event.stopPropagation();toggleMateria('${m.id}')">${e === 'aprobada' ? '✓' : ''}</div>
+  const eL={aprobada:'✓ Aprobada',disponible:'Disponible',bloqueada:'Bloqueada'};
+  document.getElementById('mat-list').innerHTML=items.map(m=>{
+    const e=getEstado(m.id);
+    return`<div class="mat-item st-${e}${selId===m.id?' sel':''}" onclick="handleClick('${m.id}')">
+      <div class="mat-cb" onclick="event.stopPropagation();toggleMateria('${m.id}')">${e==='aprobada'?'✓':''}</div>
       <div class="mat-info">
         <div class="mat-code">${m.id}</div>
         <div class="mat-name">${m.nombre}</div>
         <div class="mat-meta">
           <span class="bdg bdg-uc">${m.uc} UC</span>
-          <span class="bdg bdg-sem">S${s}</span>
-          <span class="bdg bdg-${e}">${eLabel[e] || e}</span>
+          <span class="bdg bdg-sem">S${m.sem}</span>
+          <span class="bdg bdg-${e}">${eL[e]||e}</span>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function handleItemClick(id) {
-  selId = id; renderList(); showDetail(id);
-  if (window.innerWidth < 768) document.getElementById('detail').scrollIntoView({ behavior: 'smooth' });
+function handleClick(id){
+  selId=id;renderList();showDetail(id);
+  if(window.innerWidth<768)document.getElementById('detail').scrollIntoView({behavior:'smooth'});
 }
 
-function showDetail(id) {
-  document.getElementById('d-empty').style.display = 'none';
-  const c = document.getElementById('d-content');
-  c.style.display = 'block';
-  const m = mMap[id];
-  if (!m) return;
-  const e = getEstado(id), s = m.sem || m.semestre;
-  const f = getFaltantes(id);
-
-  let alertHtml = '';
-  if (e === 'bloqueada')
-    alertHtml = `<div class="alert alert-blocked"><span class="alert-ico">🔒</span><div><strong>Materia Bloqueada.</strong> Requiere aprobar: ${f.map(x => mMap[x]?.nombre || x).join(', ')}.</div></div>`;
-  else if (e === 'aprobada')
-    alertHtml = `<div class="alert alert-approved"><span class="alert-ico">✓</span> Asignatura aprobada.</div>`;
-  else
-    alertHtml = `<div class="alert alert-ok"><span class="alert-ico">✨</span> Disponible para cursar este período.</div>`;
-
-  c.innerHTML = `
+function showDetail(id){
+  document.getElementById('d-empty').style.display='none';
+  const c=document.getElementById('d-content');c.style.display='block';
+  const m=mMap[id];if(!m)return;
+  const e=getEstado(id),f=getFaltantes(id);
+  let al='';
+  if(e==='bloqueada')al=`<div class="alert alert-blocked"><span class="alert-ico">🔒</span><div><strong>Bloqueada.</strong> Aprueba primero: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}.</div></div>`;
+  else if(e==='aprobada')al=`<div class="alert alert-approved"><span class="alert-ico">✓</span> Asignatura aprobada.</div>`;
+  else al=`<div class="alert alert-ok"><span class="alert-ico">✨</span> Disponible para cursar este período.</div>`;
+  c.innerHTML=`
     <div class="d-card">
       <div class="d-code">${m.id}</div>
       <h2 class="d-title">${m.nombre}</h2>
       <div class="d-badges">
         <span class="d-bdg uc">${m.uc} UC</span>
-        <span class="d-bdg sem">Semestre ${s}</span>
+        <span class="d-bdg sem">Semestre ${m.sem}</span>
         <span class="d-bdg ${e}">${e.toUpperCase().replace('_',' ')}</span>
       </div>
-      ${alertHtml}
-      <button class="btn ${e === 'aprobada' ? 'danger' : 'success'}" style="width:100%;margin-top:10px;justify-content:center;" onclick="toggleMateria('${id}')">
-        ${e === 'aprobada' ? '❌ Desmarcar como Aprobada' : '✓ Marcar como Aprobada'}
+      ${al}
+      <button class="btn ${e==='aprobada'?'dan':'suc'}" style="width:100%;margin-top:10px;" onclick="toggleMateria('${id}')">
+        ${e==='aprobada'?'❌ Desmarcar como Aprobada':'✓ Marcar como Aprobada'}
       </button>
-      ${e !== 'aprobada' ? `
-        <div style="margin-top:15px;padding-top:15px;border-top:1px solid var(--border);">
+      ${e!=='aprobada'?`
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
           <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:700;text-transform:uppercase;">Condición:</label>
-          <select onchange="cambiarHistorialMateria('${id}',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:var(--font);font-size:14px;outline:none;min-height:44px;">
-            <option value="nueva" ${(historialMaterias[id]||'nueva')==='nueva'?'selected':''}>🆕 Nueva / Nunca inscrita</option>
-            <option value="repite_1" ${historialMaterias[id]==='repite_1'?'selected':''}>⚠️ Repitiendo (1er Intento)</option>
-            <option value="repite_2" ${historialMaterias[id]==='repite_2'?'selected':''}>⚠️ Repitiendo (2do Intento)</option>
-            <option value="repite_3" ${historialMaterias[id]==='repite_3'?'selected':''}>🚨 Última Oportunidad</option>
+          <select onchange="cambiarHistorial('${id}',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:var(--font);font-size:14px;outline:none;min-height:44px;">
+            <option value="nueva" ${(historial[id]||'nueva')==='nueva'?'selected':''}>🆕 Nueva / Nunca inscrita</option>
+            <option value="repite_1" ${historial[id]==='repite_1'?'selected':''}>⚠️ Repitiendo (1er Intento)</option>
+            <option value="repite_2" ${historial[id]==='repite_2'?'selected':''}>⚠️ Repitiendo (2do Intento)</option>
+            <option value="repite_3" ${historial[id]==='repite_3'?'selected':''}>🚨 Última Oportunidad</option>
           </select>
-        </div>` : ''}
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:6px;">
-        <button class="btn sm purple" onclick="abrirModalMateria('${id}')">✏️ Editar en Firebase</button>
+        </div>`:''}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <button class="btn pur sm" onclick="abrirModal('${id}')">✏️ Editar en Firebase</button>
       </div>
     </div>
-    <div class="sec-title" style="padding:0 0 0 2px;">Prelaciones / Prerrequisitos</div>
+    <div class="sec-title" style="padding:0 0 0 2px;margin-bottom:8px;">Prelaciones / Prerrequisitos</div>
     <div class="pre-list">
-      ${!m.prereqs?.length ? '<p style="font-size:13px;color:var(--text3);padding:8px 0;">Sin prelaciones.</p>' :
-        m.prereqs.map(p => {
-          const pe = getEstado(p);
-          return `<div class="pre-item" onclick="handleItemClick('${p}')">
+      ${!m.prereqs?.length?'<p style="font-size:13px;color:var(--text3);padding:8px 0;">Sin prelaciones.</p>':
+        m.prereqs.map(p=>{
+          const pe=getEstado(p);
+          return`<div class="pre-item" onclick="handleClick('${p}')">
             <div class="pre-dot ${pe}"></div>
-            <div class="pre-name">${mMap[p]?.nombre || p}</div>
+            <div class="pre-name">${mMap[p]?.nombre||p}</div>
             <div class="pre-code">${p}</div>
           </div>`;
         }).join('')}
     </div>`;
 }
 
-// ════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // DASHBOARD
-// ════════════════════════════════════════════════════
-function renderDashboard() {
-  document.getElementById('f-nombre').value = student.nombre || '';
-  document.getElementById('f-cedula').value = student.cedula || '';
-  document.getElementById('f-seccion').value = student.seccion || '';
-  const uca = ucAp(), pct = Math.round((uca / TOTAL_UC) * 100);
-  document.getElementById('ring-pct').textContent = `${pct}%`;
-  document.getElementById('ring-circle').style.strokeDashoffset = 345.4 - (345.4 * pct / 100);
-  document.getElementById('rs-ap').textContent = `${uca}/${TOTAL_UC}`;
-  let ucd = 0, ucb = 0;
-  MATERIAS.forEach(m => {
-    const e = getEstado(m.id);
-    if (e === 'disponible' && !aprobadas.has(m.id)) ucd += m.uc;
-    if (e === 'bloqueada') ucb += m.uc;
-  });
-  document.getElementById('rs-disp').textContent = `${ucd} UC`;
-  document.getElementById('rs-bloq').textContent = `${ucb} UC`;
-  document.getElementById('rs-falt').textContent = `${Math.max(0, TOTAL_UC - uca)} UC`;
-  document.getElementById('rs-sem').textContent  = `${semsCompletados()}/9`;
-  renderCharts();
-  renderProximoSemestre();
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  document.getElementById('f-nombre').value=student.nombre||'';
+  document.getElementById('f-cedula').value=student.cedula||'';
+  document.getElementById('f-seccion').value=student.seccion||'';
+  const uca=ucAp(),pct=Math.round(uca/TOTAL_UC*100);
+  document.getElementById('ring-pct').textContent=`${pct}%`;
+  document.getElementById('ring-circle').style.strokeDashoffset=345.4-(345.4*pct/100);
+  document.getElementById('rs-ap').textContent=`${uca}/${TOTAL_UC}`;
+  let ucd=0,ucb=0;
+  MATERIAS.forEach(m=>{const e=getEstado(m.id);if(e==='disponible'&&!aprobadas.has(m.id))ucd+=m.uc;if(e==='bloqueada')ucb+=m.uc;});
+  document.getElementById('rs-disp').textContent=`${ucd} UC`;
+  document.getElementById('rs-bloq').textContent=`${ucb} UC`;
+  document.getElementById('rs-falt').textContent=`${Math.max(0,TOTAL_UC-uca)} UC`;
+  document.getElementById('rs-sem').textContent=`${semsCompletados()}/9`;
+  renderCharts();renderProximo();
 }
 
-function renderCharts() {
-  const bc = document.getElementById('chart-bars'), lc = document.getElementById('sem-bars');
-  bc.innerHTML = lc.innerHTML = '';
-  const sems = [1,2,3,4,5,6,7,8,9];
-  sems.forEach(s => {
-    const mats = MATERIAS.filter(m => (m.sem||m.semestre) === s);
-    const tot = mats.reduce((a,m) => a+m.uc, 0);
-    const ap  = mats.filter(m => aprobadas.has(m.id)).reduce((a,m) => a+m.uc, 0);
-    const pct = tot ? Math.round(ap/tot*100) : 0;
-    bc.innerHTML += `<div class="chart-bar-wrap">
-      <div class="chart-bar-val">${ap||''}</div>
-      <div class="chart-bar"><div class="fill-aprobada" style="height:${pct}%"></div></div>
-      <div class="chart-bar-label">S${s}</div></div>`;
-    lc.innerHTML += `<div class="prog-bar-wrap">
-      <div class="prog-bar-label"><span>Semestre ${s}</span><span>${ap}/${tot} UC (${pct}%)</span></div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${pct===100?'var(--green)':'var(--accent)'}"></div></div></div>`;
+function renderCharts(){
+  const bc=document.getElementById('chart-bars'),lc=document.getElementById('sem-bars');
+  bc.innerHTML=lc.innerHTML='';
+  [1,2,3,4,5,6,7,8,9].forEach(s=>{
+    const ms=MATERIAS.filter(m=>m.sem===s);
+    const tot=ms.reduce((a,m)=>a+m.uc,0);
+    const ap=ms.filter(m=>aprobadas.has(m.id)).reduce((a,m)=>a+m.uc,0);
+    const pct=tot?Math.round(ap/tot*100):0;
+    bc.innerHTML+=`<div class="chart-bar-wrap"><div class="chart-bar-val">${ap||''}</div><div class="chart-bar"><div class="fill-ap" style="height:${pct}%"></div></div><div class="chart-bar-label">S${s}</div></div>`;
+    lc.innerHTML+=`<div class="prog-bar-wrap"><div class="prog-bar-label"><span>Semestre ${s}</span><span>${ap}/${tot} UC (${pct}%)</span></div><div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${pct===100?'var(--green)':'var(--accent)'}"></div></div></div>`;
   });
 }
 
-function renderProximoSemestre() {
+// ======================================================
+// 🔵 PRÓXIMO PERÍODO DE INSCRIPCIÓN (CORREGIDO)
+// ======================================================
+function renderProximo(){
   const g = document.getElementById('next-sem-grid');
-  let nextSem = 9;
-  for (let s = 1; s <= 9; s++) { if (!semCompleto(s)) { nextSem = s; break; } }
-  const rezagadas = MATERIAS.filter(m => (m.sem||m.semestre) < nextSem && !aprobadas.has(m.id));
-  const delSem    = MATERIAS.filter(m => (m.sem||m.semestre) === nextSem && !aprobadas.has(m.id));
-  const candidatas = [...rezagadas, ...delSem];
-  const disponibles = candidatas.filter(m => getEstado(m.id) === 'disponible');
-  const bloqueadas2 = candidatas.filter(m => getEstado(m.id) === 'bloqueada');
-  let ucAcum = 0; const dentro = [], fuera = [];
-  disponibles.sort((a,b) => (a.sem||a.semestre) - (b.sem||b.semestre)).forEach(m => {
-    if (ucAcum + m.uc <= MAX_UC_SEM) { dentro.push(m); ucAcum += m.uc; } else fuera.push(m);
+
+  // Materias realmente disponibles
+  const disp = materiasDisponibles();
+
+  if(!disp.length){
+    g.innerHTML = `<p style="font-size:13px;color:var(--text3);padding:10px;">No hay materias disponibles actualmente.</p>`;
+    return;
+  }
+
+  // Ordenar por semestre
+  const ordenadas = disp.sort((a,b)=>a.sem - b.sem);
+
+  // Calcular UC dentro del límite
+  let dentro = [], fuera = [], uc = 0;
+  ordenadas.forEach(m=>{
+    if(uc + m.uc <= MAX_UC){
+      dentro.push(m);
+      uc += m.uc;
+    } else {
+      fuera.push(m);
+    }
   });
-  const repitiendo = dentro.filter(m => historialMaterias[m.id]?.startsWith('repite_'));
+
+  // Bloqueadas reales
+  const bloq = MATERIAS.filter(m => getEstado(m.id) === 'bloqueada');
+
   g.innerHTML = `
     <div style="grid-column:1/-1;margin-bottom:8px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;display:flex;gap:12px;flex-wrap:wrap;">
-      <span>📅 <strong style="color:var(--accent)">Próximo: Sem ${nextSem}</strong></span>
-      <span>🎒 <strong style="color:var(--green)">${ucAcum}/${MAX_UC_SEM} UC</strong></span>
-      ${rezagadas.length ? `<span style="color:var(--yellow)">⚠️ ${rezagadas.length} rezagada${rezagadas.length>1?'s':''}</span>` : ''}
+      <span>📅 <strong style="color:var(--accent)">Próximo período</strong></span>
+      <span>🎒 <strong style="color:var(--green)">${uc}/${MAX_UC} UC</strong></span>
     </div>
+
     <div class="next-sem-col">
-      <h4 class="can">✅ Puede inscribir (${dentro.length}) · ${ucAcum} UC</h4>
-      ${dentro.map(m => {
-        const h = historialMaterias[m.id]||'nueva';
-        const tag = h==='repite_1'?' (R1)':h==='repite_2'?' (R2⚠)':h==='repite_3'?' (🚨ÚLTIMO)':'';
-        return `<div class="next-mat-item can">
-          <div style="font-size:13px">${(m.sem||m.semestre)<nextSem?'⚠️':'🟢'}</div>
-          <div><div class="nmi-name">${m.nombre}${tag}</div>
-          <div class="nmi-detail">${m.uc} UC · Sem ${m.sem||m.semestre}</div></div></div>`;
-      }).join('') || '<p style="font-size:12px;color:var(--text3)">Ninguna</p>'}
-      ${fuera.length ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:7px;">
-        <div style="font-size:10px;font-weight:700;color:var(--yellow);margin-bottom:5px;text-transform:uppercase">⚡ Supera ${MAX_UC_SEM} UC — período posterior</div>
-        ${fuera.map(m=>`<div style="font-size:11px;padding:3px 0;color:var(--text2)">→ ${m.nombre} (${m.uc} UC)</div>`).join('')}
-      </div>` : ''}
+      <h4 class="can">✅ Puede inscribir (${dentro.length}) · ${uc} UC</h4>
+      ${
+        dentro.map(m=>`
+          <div class="next-mat-item can">
+            <div style="font-size:13px">🟢</div>
+            <div>
+              <div class="nmi-name">${m.nombre}</div>
+              <div class="nmi-detail">${m.uc} UC · Sem ${m.sem}</div>
+            </div>
+          </div>
+        `).join('')
+      }
     </div>
+
     <div class="next-sem-col">
-      <h4 class="cant">🔒 Bloqueadas (${bloqueadas2.length})</h4>
-      ${bloqueadas2.map(m => {
-        const f = getFaltantes(m.id);
-        return `<div class="next-mat-item cant">
-          <div style="font-size:13px">🔒</div>
-          <div><div class="nmi-name">${m.nombre}</div>
-          <div class="nmi-detail">${m.uc} UC · Sem ${m.sem||m.semestre}</div>
-          <div class="nmi-falt">Falta: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}</div></div></div>`;
-      }).join('') || '<p style="font-size:12px;color:var(--text3);padding:6px 0">¡Sin bloqueadas!</p>'}
-    </div>`;
+      <h4 class="cant">🔒 Bloqueadas (${bloq.length})</h4>
+      ${
+        bloq.map(m=>{
+          const f = getFaltantes(m.id);
+          return `
+            <div class="next-mat-item cant">
+              <div style="font-size:13px">🔒</div>
+              <div>
+                <div class="nmi-name">${m.nombre}</div>
+                <div class="nmi-detail">${m.uc} UC · Sem ${m.sem}</div>
+                <div class="nmi-falt">Falta: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}</div>
+              </div>
+            </div>
+          `;
+        }).join('')
+      }
+    </div>
+  `;
 }
 
-// ════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // MAPA
-// ════════════════════════════════════════════════════
-function renderMapa() {
-  const c = document.getElementById('pensum-grid');
-  c.innerHTML = [1,2,3,4,5,6,7,8,9].map(s => {
-    const mats = MATERIAS.filter(m => (m.sem||m.semestre) === s);
-    const ucTot = mats.reduce((a,m) => a+m.uc, 0);
-    return `<div class="sem-col">
+// ═══════════════════════════════════════════════════════
+function renderMapa(){
+  document.getElementById('pensum-grid').innerHTML=[1,2,3,4,5,6,7,8,9].map(s=>{
+    const ms=MATERIAS.filter(m=>m.sem===s);
+    const tot=ms.reduce((a,m)=>a+m.uc,0);
+    return`<div class="sem-col">
       <div class="sem-col-head">SEM ${s}</div>
       <div class="sem-col-body">
-        ${mats.map(m => {
-          const e = getEstado(m.id);
-          const hl = selId && ((mMap[selId]?.prereqs||[]).includes(m.id) || (m.prereqs||[]).includes(selId));
-          return `<div class="gm ${e}${hl?' hl':''}" onclick="handleItemClick('${m.id}');setTab('pensum')">
-            <div class="gm-ind"></div>
-            <div class="gm-code">${m.id}</div>
-            <div class="gm-name">${m.nombre}</div>
-            <div class="gm-uc">${m.uc} UC</div>
+        ${ms.map(m=>{
+          const e=getEstado(m.id);
+          const hl=selId&&((mMap[selId]?.prereqs||[]).includes(m.id)||(m.prereqs||[]).includes(selId));
+          return`<div class="gm ${e}${hl?' hl':''}" onclick="handleClick('${m.id}');setTab('pensum')">
+            <div class="gm-ind"></div><div class="gm-code">${m.id}</div>
+            <div class="gm-name">${m.nombre}</div><div class="gm-uc">${m.uc} UC</div>
           </div>`;
         }).join('')}
-        <div class="sem-uc">${ucTot} UC</div>
-      </div>
-    </div>`;
+        <div class="sem-uc">${tot} UC</div>
+      </div></div>`;
   }).join('');
 }
 
-// ════════════════════════════════════════════════════
-// ADMIN — LISTA DE MATERIAS
-// ════════════════════════════════════════════════════
-function renderAdminList() {
-  const sem = parseInt(document.getElementById('admin-filter-sem')?.value || '0');
-  const q   = (document.getElementById('admin-search')?.value || '').toLowerCase();
-  // Incluir inactivas en admin
-  const todasFB = window._fb?.materias || PENSUM_BASE;
-  const items = todasFB.filter(m => {
-    const s = m.sem || m.semestre;
-    if (sem > 0 && s !== sem) return false;
-    if (q && !m.nombre.toLowerCase().includes(q) && !m.id.toLowerCase().includes(q)) return false;
+// ═══════════════════════════════════════════════════════
+// ADMIN — LISTA
+// ═══════════════════════════════════════════════════════
+function renderAdmin(){
+  const sem=parseInt(document.getElementById('adm-sem')?.value||'0');
+  const q=(document.getElementById('adm-q')?.value||'').toLowerCase();
+  const src=fbOk?allFbMats:PENSUM_BASE;
+  const items=src.filter(m=>{
+    if(sem>0&&Number(m.sem||m.semestre)!==sem)return false;
+    if(q&&!m.nombre.toLowerCase().includes(q)&&!m.id.toLowerCase().includes(q))return false;
     return true;
-  }).sort((a,b) => ((a.sem||a.semestre) - (b.sem||b.semestre)) || a.nombre.localeCompare(b.nombre));
-
-  const container = document.getElementById('admin-mat-list');
-  if (!container) return;
-  container.innerHTML = items.length === 0
-    ? '<p style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">Sin materias. Importa el pensum base o agrega una.</p>'
-    : items.map(m => {
-        const s = m.sem || m.semestre;
-        const inactiva = m.activa === false;
-        return `<div class="admin-mat-item" style="${inactiva?'opacity:.45':''}">
+  }).sort((a,b)=>(Number(a.sem||a.semestre)-Number(b.sem||b.semestre))||a.nombre.localeCompare(b.nombre));
+  const c=document.getElementById('admin-list');
+  if(!c)return;
+  c.innerHTML=items.length===0
+    ?'<p style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">Sin materias. Haz clic en "Importar Pensum Base" para cargarlas.</p>'
+    :items.map(m=>{
+        const s=Number(m.sem||m.semestre);
+        const ina=m.activa===false;
+        return`<div class="ami${ina?' inactiva':''}">
           <div class="ami-info">
-            <div class="ami-name">${m.nombre} ${inactiva?'<span style="color:var(--text3);font-size:10px;">(Inactiva)</span>':''}</div>
-            <div class="ami-meta">${m.id} · Sem ${s} · ${m.uc} UC · ${m.prereqs?.length||0} prelaciones</div>
+            <div class="ami-name">${m.nombre}${ina?' <span style="font-size:10px;color:var(--text3)">(Inactiva)</span>':''}</div>
+            <div class="ami-meta">${m.id} · Sem ${s} · ${m.uc} UC · ${(m.prereqs||[]).length} prelaciones</div>
           </div>
-          <div class="ami-actions">
-            <button class="btn sm purple" onclick="abrirModalMateria('${m.id}')">✏️</button>
-            <button class="btn sm danger" onclick="toggleActivaMateria('${m.id}',${!inactiva})">${inactiva?'👁️':'🙈'}</button>
+          <div class="ami-btns">
+            <button class="btn pur sm" onclick="abrirModal('${m.id}')">✏️</button>
+            <button class="btn sm ${ina?'':'dan'}" onclick="toggleActiva('${m.id}',${!ina})">${ina?'👁️':'🙈'}</button>
           </div>
         </div>`;
       }).join('');
 }
 
-function updateAdminInfo() {
-  const el = document.getElementById('admin-fb-info');
-  if (!el) return;
-  const total = (window._fb?.materias || []).length;
-  el.innerHTML = fbConectado
-    ? `✅ Firebase conectado · ${total} materias en la base de datos`
-    : `⚠️ Modo local · ${PENSUM_BASE.length} materias base`;
+function updateAdminInfo(){
+  const el=document.getElementById('admin-info-txt');
+  if(!el)return;
+  const tot=allFbMats.length;
+  const act=allFbMats.filter(m=>m.activa!==false).length;
+  el.textContent=fbOk
+    ?`✅ Conectado a Firebase · ${act} activas · ${tot-act} inactivas · ${tot} total`
+    :`⚠️ Modo local · ${PENSUM_BASE.length} materias base`;
 }
 
-// ════════════════════════════════════════════════════
-// MODAL AGREGAR / EDITAR MATERIA
-// ════════════════════════════════════════════════════
-function abrirModalMateria(id) {
-  modoEdicion    = id;
-  prereqsEditando = [];
-
-  const modal = document.getElementById('modal-materia');
-  const btnElim = document.getElementById('btn-eliminar');
-
-  // Poblar select de prereqs con todas las materias
-  const allMats = window._fb?.materias || PENSUM_BASE;
-  const sel = document.getElementById('prereq-select');
-  sel.innerHTML = '<option value="">— Seleccionar materia —</option>'
-    + allMats.filter(m => m.id !== id)
-      .sort((a,b) => ((a.sem||a.semestre)-(b.sem||b.semestre)) || a.nombre.localeCompare(b.nombre))
-      .map(m => `<option value="${m.id}">${m.id} · S${m.sem||m.semestre} · ${m.nombre}</option>`)
+// ═══════════════════════════════════════════════════════
+// MODAL AGREGAR / EDITAR
+// ═══════════════════════════════════════════════════════
+function abrirModal(id){
+  editandoId=id;prereqsEdit=[];
+  const todas=fbOk?allFbMats:PENSUM_BASE;
+  const sel=document.getElementById('prereq-sel');
+  sel.innerHTML='<option value="">— Seleccionar prelación —</option>'
+    +todas.filter(m=>m.id!==id)
+      .sort((a,b)=>(Number(a.sem||a.semestre)-Number(b.sem||b.semestre))||a.nombre.localeCompare(b.nombre))
+      .map(m=>`<option value="${m.id}">[S${m.sem||m.semestre}] ${m.id} · ${m.nombre}</option>`)
       .join('');
-
-  if (id) {
-    // MODO EDICIÓN
-    const m = (allMats.find(x => x.id === id)) || mMap[id];
-    if (!m) { toast('err', 'Materia no encontrada', ''); return; }
-    document.getElementById('modal-title').textContent = '✏️ Editar Materia';
-    document.getElementById('m-id').value     = m.id;
-    document.getElementById('m-id').disabled  = true;
-    document.getElementById('m-nombre').value = m.nombre;
-    document.getElementById('m-uc').value     = m.uc;
-    document.getElementById('m-sem').value    = m.sem || m.semestre;
-    document.getElementById('m-tipo').value   = m.tipo || 'obligatoria';
-    document.getElementById('m-activa').checked = m.activa !== false;
-    prereqsEditando = [...(m.prereqs || [])];
-    btnElim.style.display = 'inline-flex';
-  } else {
-    // MODO NUEVA
-    document.getElementById('modal-title').textContent = '➕ Nueva Materia';
-    document.getElementById('m-id').value     = '';
-    document.getElementById('m-id').disabled  = false;
-    document.getElementById('m-nombre').value = '';
-    document.getElementById('m-uc').value     = '4';
-    document.getElementById('m-sem').value    = '1';
-    document.getElementById('m-tipo').value   = 'obligatoria';
-    document.getElementById('m-activa').checked = true;
-    prereqsEditando = [];
-    btnElim.style.display = 'none';
+  if(id){
+    const m=todas.find(x=>x.id===id)||mMap[id];
+    if(!m){toast('err','Materia no encontrada','');return;}
+    document.getElementById('modal-titulo').textContent='✏️ Editar Materia';
+    document.getElementById('m-id').value=m.id;
+    document.getElementById('m-id').disabled=true;
+    document.getElementById('m-nombre').value=m.nombre;
+    document.getElementById('m-uc').value=m.uc;
+    document.getElementById('m-sem').value=m.sem||m.semestre;
+    document.getElementById('m-tipo').value=m.tipo||'obligatoria';
+    document.getElementById('m-activa').checked=m.activa!==false;
+    prereqsEdit=[...(m.prereqs||[])];
+    document.getElementById('btn-del').style.display='inline-flex';
+  }else{
+    document.getElementById('modal-titulo').textContent='➕ Nueva Materia';
+    document.getElementById('m-id').value='';
+    document.getElementById('m-id').disabled=false;
+    document.getElementById('m-nombre').value='';
+    document.getElementById('m-uc').value='4';
+    document.getElementById('m-sem').value='1';
+    document.getElementById('m-tipo').value='obligatoria';
+    document.getElementById('m-activa').checked=true;
+    document.getElementById('btn-del').style.display='none';
   }
   renderChips();
-  modal.classList.add('open');
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-function cerrarModal() {
-  document.getElementById('modal-materia').classList.remove('open');
-  modoEdicion = null;
-}
+function cerrarModal(){document.getElementById('modal-bg').classList.remove('open');editandoId=null;}
 
-function agregarPrereq() {
-  const sel = document.getElementById('prereq-select');
-  const val = sel.value;
-  if (!val || prereqsEditando.includes(val)) { sel.value = ''; return; }
-  prereqsEditando.push(val);
-  sel.value = '';
+function addPrereq(){
+  const v=document.getElementById('prereq-sel').value;
+  if(!v||prereqsEdit.includes(v)){document.getElementById('prereq-sel').value='';return;}
+  prereqsEdit.push(v);
+  document.getElementById('prereq-sel').value='';
   renderChips();
 }
 
-function quitarPrereq(id) {
-  prereqsEditando = prereqsEditando.filter(p => p !== id);
-  renderChips();
+function removePrereq(id){prereqsEdit=prereqsEdit.filter(p=>p!==id);renderChips();}
+
+function renderChips(){
+  document.getElementById('prereq-chips').innerHTML=
+    prereqsEdit.length===0
+      ?'<span style="font-size:11px;color:var(--text3);">Sin prelaciones asignadas</span>'
+      :prereqsEdit.map(id=>`<span class="chip">${id}<span class="chip-x" onclick="removePrereq('${id}')">✕</span></span>`).join('');
 }
 
-function renderChips() {
-  const c = document.getElementById('prereq-chips');
-  c.innerHTML = prereqsEditando.length === 0
-    ? '<span style="font-size:11px;color:var(--text3);">Sin prelaciones</span>'
-    : prereqsEditando.map(id => {
-        const m = mMap[id] || (window._fb?.materias||[]).find(x=>x.id===id);
-        return `<span class="chip">${id}<span class="chip-rm" onclick="quitarPrereq('${id}')">✕</span></span>`;
-      }).join('');
-}
-
-function guardarMateria() {
-  const id     = document.getElementById('m-id').value.trim().toUpperCase();
-  const nombre = document.getElementById('m-nombre').value.trim();
-  const uc     = parseInt(document.getElementById('m-uc').value);
-  const sem    = parseInt(document.getElementById('m-sem').value);
-  const tipo   = document.getElementById('m-tipo').value;
-  const activa = document.getElementById('m-activa').checked;
-
-  if (!id || !nombre || !uc || !sem) {
-    toast('err', 'Completa todos los campos obligatorios', ''); return;
-  }
-
-  const materia = { id, nombre, uc, semestre: sem, sem, prereqs: prereqsEditando, tipo, activa };
-
-  if (!fbConectado || !window._fb) {
-    toast('err', '⚠️ Firebase no conectado', 'Configura Firebase para guardar cambios en la nube.');
-    return;
-  }
-
+async function guardarMateria(){
+  const id=document.getElementById('m-id').value.trim().toUpperCase();
+  const nombre=document.getElementById('m-nombre').value.trim();
+  const uc=parseInt(document.getElementById('m-uc').value);
+  const sem=parseInt(document.getElementById('m-sem').value);
+  const tipo=document.getElementById('m-tipo').value;
+  const activa=document.getElementById('m-activa').checked;
+  if(!id||!nombre||!uc||!sem){toast('err','Completa los campos obligatorios','');return;}
+  if(!fbOk||!FB){toast('err','Firebase no conectado','Los cambios no se pueden guardar en la nube.');return;}
+  const mat={id,nombre,uc,sem,semestre:sem,prereqs:prereqsEdit,tipo,activa};
   showLoading('Guardando en Firebase…');
-  const { db, ref, set } = window._fb;
-  set(ref(db, `pensum/materias/${id}`), materia)
-    .then(() => {
-      hideLoading();
-      cerrarModal();
-      toast('ok', `✅ Guardado: ${nombre}`, `Semestre ${sem} · ${uc} UC · ${prereqsEditando.length} prelaciones`);
-    })
-    .catch(err => {
-      hideLoading();
-      toast('err', 'Error al guardar', err.message);
-    });
+  try{
+    await FB.set(FB.ref(FB.db,`pensum/materias/${id}`),mat);
+    hideLoading();cerrarModal();
+    toast('ok',`✅ Guardado: ${nombre}`,`Sem ${sem} · ${uc} UC · ${prereqsEdit.length} prelaciones`);
+  }catch(e){hideLoading();toast('err','Error al guardar',e.message);}
 }
 
-function eliminarMateriaActual() {
-  if (!modoEdicion) return;
-  const m = mMap[modoEdicion] || {};
-  if (!confirm(`¿Eliminar definitivamente "${m.nombre || modoEdicion}"?\nEsta acción no se puede deshacer.`)) return;
-
-  if (!fbConectado || !window._fb) {
-    toast('err', 'Firebase no conectado', ''); return;
-  }
+async function eliminarMateria(){
+  if(!editandoId)return;
+  const m=mMap[editandoId]||{};
+  if(!confirm(`¿Eliminar definitivamente "${m.nombre||editandoId}"?\nNo se puede deshacer.`))return;
+  if(!fbOk||!FB){toast('err','Firebase no conectado','');return;}
   showLoading('Eliminando…');
-  const { db, ref, remove } = window._fb;
-  remove(ref(db, `pensum/materias/${modoEdicion}`))
-    .then(() => { hideLoading(); cerrarModal(); toast('ok', `Eliminada: ${m.nombre || modoEdicion}`, ''); })
-    .catch(err => { hideLoading(); toast('err', 'Error al eliminar', err.message); });
+  try{
+    await FB.remove(FB.ref(FB.db,`pensum/materias/${editandoId}`));
+    hideLoading();cerrarModal();toast('ok',`Eliminada: ${m.nombre||editandoId}`,'');
+  }catch(e){hideLoading();toast('err','Error',e.message);}
 }
 
-function toggleActivaMateria(id, nuevoEstado) {
-  if (!fbConectado || !window._fb) {
-    toast('err', 'Firebase no conectado', ''); return;
-  }
-  const { db, ref, update } = window._fb;
-  update(ref(db, `pensum/materias/${id}`), { activa: nuevoEstado })
-    .then(() => toast('ok', `Materia ${nuevoEstado ? 'activada' : 'desactivada'}`, id))
-    .catch(err => toast('err', 'Error', err.message));
+async function toggleActiva(id,estado){
+  if(!fbOk||!FB){toast('err','Firebase no conectado','');return;}
+  try{
+    await FB.update(FB.ref(FB.db,`pensum/materias/${id}`),{activa:estado});
+    toast('ok',`Materia ${estado?'activada':'desactivada'}`,id);
+  }catch(e){toast('err','Error',e.message);}
 }
 
-// ════════════════════════════════════════════════════
-// IMPORTAR PENSUM BASE A FIREBASE
-// ════════════════════════════════════════════════════
-async function importarPensumBase() {
-  if (!fbConectado || !window._fb) {
-    toast('err', 'Firebase no conectado', 'Configura Firebase primero en el panel de configuración.');
-    return;
-  }
-  const { db, ref, set } = window._fb;
-  const total = PENSUM_BASE.length;
-  if (!confirm(`¿Importar las ${total} materias del pensum base a Firebase?\n\nSi ya existen materias, serán sobrescritas.`)) return;
-
-  showLoading(`Importando ${total} materias…`);
-  try {
-    // Construir objeto { id: materia }
-    const obj = {};
-    PENSUM_BASE.forEach(m => { obj[m.id] = m; });
-
-    await set(ref(db, 'pensum/materias'), obj);
-    await set(ref(db, 'pensum/info'), {
-      universidad: 'UNEFA', nucleo: 'Lara',
-      carrera: 'Ingeniería de Sistemas', modalidad: 'Diurno',
-      plan: '2010', total_uc: 224, max_uc_por_semestre: 33, total_semestres: 9
+async function importarPensum(){
+  if(!fbOk||!FB){toast('err','Firebase no conectado','');return;}
+  if(!confirm(`¿Importar las ${PENSUM_BASE.length} materias del pensum base?\nSi ya existen serán sobreescritas.`))return;
+  showLoading(`Importando ${PENSUM_BASE.length} materias…`);
+  try{
+    const obj={};PENSUM_BASE.forEach(m=>{obj[m.id]=m;});
+    await FB.set(FB.ref(FB.db,'pensum/materias'),obj);
+    await FB.set(FB.ref(FB.db,'pensum/info'),{
+      universidad:'UNEFA',nucleo:'Lara',carrera:'Ingeniería de Sistemas',
+      modalidad:'Diurno',plan:'2010',total_uc:224,max_uc_por_semestre:33,total_semestres:9
     });
     hideLoading();
-    toast('ok', `✅ ${total} materias importadas a Firebase`, '¡El pensum ya está en la nube!');
-  } catch (err) {
-    hideLoading();
-    toast('err', 'Error al importar', err.message);
-  }
+    toast('ok',`✅ ${PENSUM_BASE.length} materias importadas`,'¡El pensum está en Firebase!');
+  }catch(e){hideLoading();toast('err','Error al importar',e.message);}
 }
 
-function recargarDesdeFB() {
-  if (!fbConectado) { toast('err', 'Firebase no conectado', ''); return; }
-  showLoading('Recargando…');
-  setTimeout(() => { hideLoading(); toast('ok', 'Firebase actualiza automáticamente en tiempo real', ''); }, 800);
-}
-
-function exportarPensumJSON() {
-  const data = window._fb?.materias || MATERIAS;
-  const json = JSON.stringify({ pensum: { info: { total_uc: TOTAL_UC }, materias: Object.fromEntries(data.map(m => [m.id, m])) } }, null, 2);
-  const a = document.createElement('a');
-  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
-  a.download = `pensum_unefa_${new Date().toISOString().slice(0,10)}.json`;
+function exportarJSON(){
+  const src=fbOk?allFbMats:MATERIAS;
+  const obj={pensum:{info:{total_uc:TOTAL_UC,max_uc_por_semestre:MAX_UC},materias:{}}};
+  src.forEach(m=>{obj.pensum.materias[m.id]=m;});
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(obj,null,2));
+  a.download=`pensum_unefa_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
-  toast('ok', 'JSON exportado', `${data.length} materias`);
+  toast('ok','JSON exportado',`${src.length} materias`);
 }
 
-// ════════════════════════════════════════════════════
-// EXCEL
-// ════════════════════════════════════════════════════
-function exportExcel() {
-  const wb = XLSX.utils.book_new();
-  const uca = ucAp(), pct = Math.round(uca/TOTAL_UC*100);
-  const eLabel = { aprobada:'APROBADA', disponible:'DISPONIBLE', bloqueada:'BLOQUEADA' };
-  const hLabel = { nueva:'NUEVA', repite_1:'1ER INTENTO', repite_2:'2DO INTENTO', repite_3:'ÚLTIMO INTENTO' };
-
-  // Hoja 1: Resumen
-  const ws1 = XLSX.utils.aoa_to_sheet([
-    ['REPORTE ACADÉMICO — UNEFA NÚCLEO LARA'],
-    ['Ingeniería de Sistemas · Plan 2010'],
-    [],
-    ['Nombre y Apellido:', student.nombre || ''],
-    ['Cédula:', student.cedula || ''],
-    ['Sección:', student.seccion || ''],
-    ['Fecha:', new Date().toLocaleDateString('es-VE')],
-    [],
-    ['UC Aprobadas:', uca], ['UC Faltantes:', TOTAL_UC-uca],
-    ['Total UC:', TOTAL_UC], ['Avance:', pct+'%'],
-    ['Materias Aprobadas:', aprobadas.size], ['Total Materias:', MATERIAS.length],
-    ['Semestres Completados:', semsCompletados()],
-    [],
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const uca=ucAp(),pct=Math.round(uca/TOTAL_UC*100);
+  const eL={aprobada:'APROBADA',disponible:'DISPONIBLE',bloqueada:'BLOQUEADA'};
+  const hL={nueva:'NUEVA',repite_1:'1ER INTENTO',repite_2:'2DO INTENTO',repite_3:'ÚLTIMO INTENTO'};
+  const ws1=XLSX.utils.aoa_to_sheet([
+    ['REPORTE ACADÉMICO — UNEFA NÚCLEO LARA'],['Ingeniería de Sistemas · Plan 2010'],[],
+    ['Nombre:',student.nombre||''],['Cédula:',student.cedula||''],
+    ['Sección:',student.seccion||''],['Fecha:',new Date().toLocaleDateString('es-VE')],[],
+    ['UC Aprobadas:',uca],['UC Faltantes:',TOTAL_UC-uca],['Total UC:',TOTAL_UC],['Avance:',pct+'%'],
+    ['Materias Aprobadas:',aprobadas.size],['Total Materias:',MATERIAS.length],['Sems. Completados:',semsCompletados()],[],
     ['Semestre','UC Aprobadas','UC Total','%'],
-    ...[1,2,3,4,5,6,7,8,9].map(s => {
-      const tot = MATERIAS.filter(m=>(m.sem||m.semestre)===s).reduce((a,m)=>a+m.uc,0);
-      const ap  = MATERIAS.filter(m=>(m.sem||m.semestre)===s&&aprobadas.has(m.id)).reduce((a,m)=>a+m.uc,0);
-      return [`Semestre ${s}`, ap, tot, Math.round(ap/tot*100)+'%'];
+    ...[1,2,3,4,5,6,7,8,9].map(s=>{
+      const ms=MATERIAS.filter(m=>m.sem===s);
+      const tot=ms.reduce((a,m)=>a+m.uc,0);
+      const ap=ms.filter(m=>aprobadas.has(m.id)).reduce((a,m)=>a+m.uc,0);
+      return[`Semestre ${s}`,ap,tot,tot?Math.round(ap/tot*100)+'%':'0%'];
     })
   ]);
-  ws1['!cols'] = [{wch:30},{wch:20},{wch:12},{wch:12}];
-  XLSX.utils.book_append_sheet(wb, ws1, 'Resumen');
-
-  // Hoja 2: Pensum completo
-  const ws2rows = [['Código','Asignatura','Semestre','UC','Estado','Prelaciones','Condición']];
-  [1,2,3,4,5,6,7,8,9].forEach(s => {
-    MATERIAS.filter(m=>(m.sem||m.semestre)===s).forEach(m => {
-      ws2rows.push([m.id, m.nombre, `Semestre ${s}`, m.uc,
-        eLabel[getEstado(m.id)]||'', (m.prereqs||[]).map(p=>mMap[p]?.nombre||p).join(' / ')||'—',
-        hLabel[historialMaterias[m.id]]||'NUEVA']);
+  ws1['!cols']=[{wch:28},{wch:22},{wch:12},{wch:10}];
+  XLSX.utils.book_append_sheet(wb,ws1,'Resumen');
+  const ws2r=[['Código','Asignatura','Semestre','UC','Estado','Prelaciones','Condición']];
+  [1,2,3,4,5,6,7,8,9].forEach(s=>{
+    MATERIAS.filter(m=>m.sem===s).forEach(m=>{
+      ws2r.push([m.id,m.nombre,`Semestre ${s}`,m.uc,eL[getEstado(m.id)]||'',
+        (m.prereqs||[]).map(p=>mMap[p]?.nombre||p).join(' / ')||'—',hL[historial[m.id]]||'NUEVA']);
     });
   });
-  const ws2 = XLSX.utils.aoa_to_sheet(ws2rows);
-  ws2['!cols'] = [{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50},{wch:14}];
-  XLSX.utils.book_append_sheet(wb, ws2, 'Pensum');
-
-  // Hoja 3: Aprobadas
-  const ws3rows = [['#','Código','Asignatura','Semestre','UC']];
-  let i=1;
-  MATERIAS.filter(m=>aprobadas.has(m.id)).forEach(m => ws3rows.push([i++,m.id,m.nombre,`Semestre ${m.sem||m.semestre}`,m.uc]));
-  ws3rows.push(['','','','Total UC:', uca]);
-  const ws3 = XLSX.utils.aoa_to_sheet(ws3rows);
-  ws3['!cols'] = [{wch:4},{wch:16},{wch:40},{wch:12},{wch:5}];
-  XLSX.utils.book_append_sheet(wb, ws3, 'Aprobadas');
-
-  // Hoja 4: Pendientes
-  const ws4rows = [['Código','Asignatura','Semestre','UC','Estado','Faltan Aprobar']];
-  MATERIAS.filter(m=>!aprobadas.has(m.id)).forEach(m => {
-    ws4rows.push([m.id, m.nombre, `Semestre ${m.sem||m.semestre}`, m.uc,
-      eLabel[getEstado(m.id)]||'', getFaltantes(m.id).map(x=>mMap[x]?.nombre||x).join(' / ')||'—']);
+  const ws2=XLSX.utils.aoa_to_sheet(ws2r);ws2['!cols']=[{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Pensum');
+  const ws3r=[['#','Código','Asignatura','Semestre','UC']];let i=1;
+  MATERIAS.filter(m=>aprobadas.has(m.id)).forEach(m=>ws3r.push([i++,m.id,m.nombre,`Semestre ${m.sem}`,m.uc]));
+  ws3r.push(['','','','Total UC:',uca]);
+  const ws3=XLSX.utils.aoa_to_sheet(ws3r);ws3['!cols']=[{wch:4},{wch:16},{wch:40},{wch:12},{wch:5}];
+  XLSX.utils.book_append_sheet(wb,ws3,'Aprobadas');
+  const ws4r=[['Código','Asignatura','Semestre','UC','Estado','Falta Aprobar']];
+  MATERIAS.filter(m=>!aprobadas.has(m.id)).forEach(m=>{
+    ws4r.push([m.id,m.nombre,`Semestre ${m.sem}`,m.uc,eL[getEstado(m.id)]||'',
+      getFaltantes(m.id).map(x=>mMap[x]?.nombre||x).join(' / ')||'—']);
   });
-  const ws4 = XLSX.utils.aoa_to_sheet(ws4rows);
-  ws4['!cols'] = [{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50}];
-  XLSX.utils.book_append_sheet(wb, ws4, 'Pendientes');
-
-  XLSX.writeFile(wb, `Pensum_UNEFA_${student.cedula||'Estudiante'}_${new Date().toISOString().slice(0,10)}.xlsx`);
-  toast('ok', 'Reporte Excel exportado', '4 hojas: Resumen, Pensum, Aprobadas, Pendientes');
+  const ws4=XLSX.utils.aoa_to_sheet(ws4r);ws4['!cols']=[{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50}];
+  XLSX.utils.book_append_sheet(wb,ws4,'Pendientes');
+  XLSX.writeFile(wb,`Pensum_UNEFA_${student.cedula||'Estudiante'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast('ok','Excel exportado','4 hojas: Resumen, Pensum, Aprobadas, Pendientes');
 }
 
-// ════════════════════════════════════════════════════
-// TAB SWITCHING
-// ════════════════════════════════════════════════════
-function setTab(t) {
-  currentTab = t;
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+function setTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.getElementById(`tab-${t}`)?.classList.add('active');
   document.getElementById(`view-${t}`)?.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
   render();
-  if (t === 'admin') renderAdminList();
+  if(t==='admin')renderAdmin();
 }
 
-// ════════════════════════════════════════════════════
-// LOADING
-// ════════════════════════════════════════════════════
-function showLoading(txt) {
-  document.getElementById('loading-text').textContent = txt || 'Cargando…';
-  document.getElementById('loading').classList.add('show');
-}
-function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+function showLoading(txt){document.getElementById('loading-txt').textContent=txt||'Cargando…';document.getElementById('loading').classList.add('show');}
+function hideLoading(){document.getElementById('loading').classList.remove('show');}
 
-// ════════════════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════════════════
-function toast(type, title, msg) {
-  const icons = { ok:'✅', err:'⛔', warn:'⚠️' };
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<div class="t-icon">${icons[type]||'ℹ️'}</div>
-    <div class="t-msg"><strong>${title}</strong>${msg?`<small>${msg}</small>`:''}</div>`;
+function toast(type,title,msg){
+  const icons={ok:'✅',err:'⛔',warn:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<div class="t-icon">${icons[type]||'ℹ️'}</div><div class="t-msg"><strong>${title}</strong>${msg?`<small>${msg}</small>`:''}</div>`;
   document.getElementById('toast-wrap').appendChild(el);
-  setTimeout(() => el.remove(), 4500);
+  setTimeout(()=>el.remove(),4500);
 }
 
-// Cerrar modal con Escape
-document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
-document.getElementById('modal-materia').addEventListener('click', e => {
-  if (e.target === e.currentTarget) cerrarModal();
-});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
 
-// ════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════
-// Mostrar URL guardada si existe
-const savedUrl = localStorage.getItem('unefa_fb_url');
-if (savedUrl) document.getElementById('cfg-url').value = savedUrl;
-
+// INICIO — conectar Firebase automáticamente
 render();
+conectarFirebase();
 </script>
 </body>
 </html>
-HTMLEOF
