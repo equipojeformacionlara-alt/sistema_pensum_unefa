@@ -225,6 +225,39 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   .logo-icon{width:42px;height:42px;font-size:20px;}.logo h1{font-size:17px;}
 }
 @media(min-width:1200px){.sidebar{width:360px;min-width:360px;}}
+
+/* ── MODAL CLAVE ADMIN ── */
+.lock-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.lock-bg.open{display:flex;}
+.lock-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  padding:32px 28px;width:100%;max-width:380px;text-align:center;animation:mIn .25s ease;}
+.lock-icon{font-size:48px;margin-bottom:14px;display:block;}
+.lock-box h2{font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.lock-box p{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.5;}
+.lock-input-wrap{position:relative;margin-bottom:14px;}
+.lock-input{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:10px;
+  padding:13px 46px 13px 16px;color:var(--text);font-family:var(--mono);font-size:18px;
+  letter-spacing:4px;outline:none;transition:border-color .2s;text-align:center;}
+.lock-input:focus{border-color:var(--accent);}
+.lock-input.error{border-color:var(--red);animation:shake .4s ease;}
+.lock-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  cursor:pointer;font-size:18px;opacity:.5;transition:opacity .15s;background:none;border:none;color:var(--text);}
+.lock-eye:hover{opacity:1;}
+.lock-error{font-size:12px;color:var(--red);margin-bottom:12px;min-height:18px;font-family:var(--mono);}
+.lock-attempts{font-size:11px;color:var(--text3);margin-top:10px;font-family:var(--mono);}
+.lock-btn{width:100%;padding:13px;background:var(--accent);border:none;border-radius:10px;
+  color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.lock-btn:hover{background:#3b78e7;}
+.lock-btn:disabled{opacity:.5;cursor:not-allowed;}
+.lock-cancel{margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;
+  cursor:pointer;font-family:var(--font);transition:color .15s;}
+.lock-cancel:hover{color:var(--text);}
+.admin-session-bar{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);
+  border-radius:8px;padding:8px 14px;font-size:12px;color:var(--accent3);margin-bottom:0;}
+.admin-session-bar span{display:flex;align-items:center;gap:6px;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
 </style>
 </head>
 <body>
@@ -245,7 +278,7 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   <div class="tab active" onclick="setTab('pensum')" id="tab-pensum">📋 Pensum <span class="tab-badge" id="tbdg">0</span></div>
   <div class="tab" onclick="setTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
   <div class="tab" onclick="setTab('mapa')" id="tab-mapa">🗺 Mapa</div>
-  <div class="tab" onclick="setTab('admin')" id="tab-admin">⚙️ Administrar <span class="tab-badge adm">DB</span></div>
+  <div class="tab" onclick="pedirClave()" id="tab-admin">⚙️ Administrar <span class="tab-badge adm">🔒</span></div>
 </nav>
 <div class="stats-bar">
   <div class="stat"><div class="stat-val c-green" id="st-ap">0</div><div class="stat-label">Aprobadas</div></div>
@@ -302,6 +335,10 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   <div class="pensum-grid" id="pensum-grid"></div>
 </div>
 <div class="view" id="view-admin">
+  <div class="admin-session-bar">
+    <span>🔐 <strong>Sesión de Administrador activa</strong></span>
+    <button class="btn dan sm" onclick="cerrarSesionAdmin()">⏏ Cerrar sesión</button>
+  </div>
   <div class="admin-bar">
     <h2>⚙️ Administrador del Pensum</h2>
     <p id="admin-info-txt">Conectando a Firebase…</p>
@@ -329,6 +366,27 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
   </div>
 </div>
 </div>
+<!-- ══ MODAL CLAVE ADMINISTRADOR ══ -->
+<div class="lock-bg" id="lock-bg">
+  <div class="lock-box">
+    <span class="lock-icon">🔐</span>
+    <h2>Área Restringida</h2>
+    <p>Esta sección es exclusiva para personal autorizado.<br>Ingresa la clave de administrador para continuar.</p>
+    <div class="lock-input-wrap">
+      <input type="password" class="lock-input" id="lock-input"
+        placeholder="••••••••"
+        maxlength="20"
+        onkeydown="if(event.key==='Enter')verificarClave()"
+        oninput="document.getElementById('lock-err').textContent=''">
+      <button class="lock-eye" id="lock-eye" onclick="toggleLockEye()" title="Mostrar/ocultar">👁️</button>
+    </div>
+    <div class="lock-error" id="lock-err"></div>
+    <button class="lock-btn" onclick="verificarClave()">🔓 Ingresar</button>
+    <div class="lock-attempts" id="lock-attempts"></div>
+    <button class="lock-cancel" onclick="cerrarLock()">Cancelar</button>
+  </div>
+</div>
+
 <div class="modal-bg" id="modal-bg" onclick="if(event.target===this)cerrarModal()">
   <div class="modal">
     <h3 id="modal-titulo">➕ Nueva Materia</h3>
@@ -357,9 +415,7 @@ body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--fo
 </div>
 <div class="loading" id="loading"><div class="spinner"></div><div class="loading-txt" id="loading-txt">Cargando…</div></div>
 <div class="toast-wrap" id="toast-wrap"></div>
-"""
 
-script = r"""
 <script>
 // ═══════════════════════════════════════════════════════
 // FIREBASE URL — pensum-sis-unefa
@@ -794,6 +850,9 @@ function renderCharts(){
 // ======================================================
 // 🔵 PRÓXIMO PERÍODO DE INSCRIPCIÓN (CORREGIDO)
 // ======================================================
+// ======================================================
+// 🔵 PRÓXIMO PERÍODO DE INSCRIPCIÓN (CORREGIDO)
+// ======================================================
 function renderProximo(){
   const g = document.getElementById('next-sem-grid');
 
@@ -863,7 +922,6 @@ function renderProximo(){
     </div>
   `;
 }
-
 // ═══════════════════════════════════════════════════════
 // MAPA
 // ═══════════════════════════════════════════════════════
@@ -1095,11 +1153,71 @@ function exportExcel(){
   });
   const ws4=XLSX.utils.aoa_to_sheet(ws4r);ws4['!cols']=[{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50}];
   XLSX.utils.book_append_sheet(wb,ws4,'Pendientes');
+  // ── HOJA 5: Materias Disponibles — Próximo Período ──────────────
+  // Calcula qué puede inscribir el estudiante (límite: MAX_UC UC)
+  const _dispOrdenadas = materiasDisponibles().sort((a,b)=>a.sem - b.sem);
+  let _ucPer=0; const _dentroPer=[]; const _fueraPer=[];
+  _dispOrdenadas.forEach(m=>{
+    if(_ucPer+m.uc<=MAX_UC){ _dentroPer.push(m); _ucPer+=m.uc; }
+    else { _fueraPer.push(m); }
+  });
+  const _bloqPer = MATERIAS.filter(m=>getEstado(m.id)==='bloqueada').sort((a,b)=>a.sem-b.sem);
+
+  const ws5r=[
+    ['MATERIAS DISPONIBLES — PRÓXIMO PERÍODO DE INSCRIPCIÓN'],
+    [`Universidad: UNEFA Núcleo Lara · Carrera: Ingeniería de Sistemas · Plan 2010`],
+    [],
+    ['Estudiante:', student.nombre||'_______________________________', '', 'Cédula:', student.cedula||'___________________'],
+    ['Sección:',   student.seccion||'_______________',                '', 'Fecha:', new Date().toLocaleDateString('es-VE')],
+    [],
+    [`Límite de UC por período: ${MAX_UC} UC`, '', '', `UC a inscribir: ${_ucPer} / ${MAX_UC} UC`],
+    [],
+    // Sección 1: PUEDE INSCRIBIR
+    [`✅ PUEDE INSCRIBIR ESTE PERÍODO (${_dentroPer.length} materias · ${_ucPer} UC)`],
+    ['N°', 'Código', 'Asignatura', 'Sem', 'UC', 'Tipo'],
+  ];
+  _dentroPer.forEach((m,i)=>{
+    ws5r.push([i+1, m.id, m.nombre, `Semestre ${m.sem}`, m.uc, m.tipo||'obligatoria']);
+  });
+  ws5r.push(['', '', '', '', `TOTAL: ${_ucPer} UC`, '']);
+  ws5r.push([]);
+
+  // Sección 2: SUPERA LÍMITE
+  if(_fueraPer.length){
+    ws5r.push([`⚡ DISPONIBLES PERO SUPERAN EL LÍMITE DE ${MAX_UC} UC (inscribir en período posterior)`]);
+    ws5r.push(['N°', 'Código', 'Asignatura', 'Sem', 'UC', '']);
+    _fueraPer.forEach((m,i)=>ws5r.push([i+1, m.id, m.nombre, `Semestre ${m.sem}`, m.uc, '']));
+    ws5r.push([]);
+  }
+
+  // Sección 3: BLOQUEADAS
+  ws5r.push([`🔒 NO PUEDE INSCRIBIR — FALTAN PRELACIONES (${_bloqPer.length} materias)`]);
+  ws5r.push(['N°', 'Código', 'Asignatura', 'Sem', 'UC', 'Debe aprobar primero']);
+  _bloqPer.forEach((m,i)=>{
+    const falt = getFaltantes(m.id).map(x=>mMap[x]?.nombre||x).join(' / ') || '—';
+    ws5r.push([i+1, m.id, m.nombre, `Semestre ${m.sem}`, m.uc, falt]);
+  });
+
+  const ws5 = XLSX.utils.aoa_to_sheet(ws5r);
+  ws5['!cols'] = [{wch:4},{wch:16},{wch:42},{wch:12},{wch:6},{wch:55}];
+
+  // Aplicar anchos de columna también a fila de encabezados combinados
+  ws5['!merges'] = [
+    {s:{r:0,c:0},e:{r:0,c:5}},  // Título
+    {s:{r:1,c:0},e:{r:1,c:5}},  // Subtítulo
+  ];
+  XLSX.utils.book_append_sheet(wb, ws5, 'Próximo Período');
+
   XLSX.writeFile(wb,`Pensum_UNEFA_${student.cedula||'Estudiante'}_${new Date().toISOString().slice(0,10)}.xlsx`);
-  toast('ok','Excel exportado','4 hojas: Resumen, Pensum, Aprobadas, Pendientes');
+  toast('ok','Excel exportado ✅','5 hojas: Resumen · Pensum · Aprobadas · Pendientes · Próximo Período');
 }
 
 function setTab(t){
+  // Bloquear acceso directo al admin sin sesión
+  if(t==='admin' && !adminSesionActiva){
+    pedirClave();
+    return;
+  }
   currentTab=t;
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
@@ -1107,7 +1225,7 @@ function setTab(t){
   document.getElementById(`view-${t}`)?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   render();
-  if(t==='admin')renderAdmin();
+  if(t==='admin') renderAdmin();
 }
 
 function showLoading(txt){document.getElementById('loading-txt').textContent=txt||'Cargando…';document.getElementById('loading').classList.add('show');}
@@ -1122,7 +1240,160 @@ function toast(type,title,msg){
   setTimeout(()=>el.remove(),4500);
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    cerrarModal();
+    cerrarLock();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE CLAVE ADMINISTRADOR
+// ═══════════════════════════════════════════════════════
+// ┌─────────────────────────────────────────────────────────────┐
+// │  CLAVE DEL ADMINISTRADOR                                    │
+// │  Para cambiarla: edita SOLO la línea de abajo              │
+// │  Ejemplo: const ADMIN_CLAVE = 'MiNuevaClave2025';          │
+// └─────────────────────────────────────────────────────────────┘
+const ADMIN_CLAVE = 'DIN2026';   // ← CAMBIA AQUÍ LA CLAVE
+
+// Hash simple para no exponer la clave en texto plano en memoria
+function hashStr(s){ let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}return h.toString(36);}
+const ADMIN_HASH_ENCODED = hashStr(ADMIN_CLAVE);
+
+let adminSesionActiva = false;
+let lockIntentos = 0;
+const MAX_INTENTOS = 5;
+let lockBloqueadoHasta = 0;
+
+function pedirClave(){
+  // Si ya tiene sesión activa, ir directo al admin
+  if(adminSesionActiva){
+    setTab('admin');
+    return;
+  }
+  // Verificar si está bloqueado por intentos fallidos
+  const ahora = Date.now();
+  if(lockBloqueadoHasta > ahora){
+    const seg = Math.ceil((lockBloqueadoHasta - ahora)/1000);
+    document.getElementById('lock-err').textContent = `Demasiados intentos. Espera ${seg}s`;
+    document.getElementById('lock-bg').classList.add('open');
+    document.getElementById('lock-input').disabled = true;
+    document.querySelector('.lock-btn').disabled = true;
+    // Countdown
+    const iv = setInterval(()=>{
+      const r = Math.ceil((lockBloqueadoHasta - Date.now())/1000);
+      if(r<=0){
+        clearInterval(iv);
+        document.getElementById('lock-err').textContent='';
+        document.getElementById('lock-input').disabled=false;
+        document.querySelector('.lock-btn').disabled=false;
+        document.getElementById('lock-attempts').textContent='';
+      } else {
+        document.getElementById('lock-err').textContent=`Bloqueado. Espera ${r}s`;
+      }
+    },1000);
+    return;
+  }
+  // Limpiar y mostrar modal
+  document.getElementById('lock-input').value='';
+  document.getElementById('lock-input').type='password';
+  document.getElementById('lock-eye').textContent='👁️';
+  document.getElementById('lock-err').textContent='';
+  document.getElementById('lock-input').classList.remove('error');
+  const restantes = MAX_INTENTOS - lockIntentos;
+  document.getElementById('lock-attempts').textContent =
+    lockIntentos > 0 ? `Intentos restantes: ${restantes}` : '';
+  document.getElementById('lock-input').disabled=false;
+  document.querySelector('.lock-btn').disabled=false;
+  document.getElementById('lock-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('lock-input').focus(), 200);
+}
+
+function verificarClave(){
+  const inp = document.getElementById('lock-input');
+  const val = inp.value;
+  if(!val){ inp.classList.add('error'); setTimeout(()=>inp.classList.remove('error'),500); return; }
+
+  if(hashStr(val) === ADMIN_HASH_ENCODED){
+    // CLAVE CORRECTA
+    lockIntentos = 0;
+    lockBloqueadoHasta = 0;
+    adminSesionActiva = true;
+    cerrarLock();
+    setTab('admin');
+    toast('ok','✅ Acceso autorizado','Sesión de administrador iniciada');
+    // Auto-cerrar sesión después de 30 minutos de inactividad
+    resetInactividadTimer();
+  } else {
+    // CLAVE INCORRECTA
+    lockIntentos++;
+    inp.value='';
+    inp.classList.add('error');
+    setTimeout(()=>inp.classList.remove('error'),500);
+
+    if(lockIntentos >= MAX_INTENTOS){
+      lockBloqueadoHasta = Date.now() + 60000; // bloquear 60s
+      document.getElementById('lock-err').textContent='Demasiados intentos. Bloqueado 60 segundos.';
+      inp.disabled=true;
+      document.querySelector('.lock-btn').disabled=true;
+      document.getElementById('lock-attempts').textContent='';
+      setTimeout(()=>{
+        lockIntentos=0;
+        inp.disabled=false;
+        document.querySelector('.lock-btn').disabled=false;
+        document.getElementById('lock-err').textContent='';
+      },60000);
+    } else {
+      const restantes = MAX_INTENTOS - lockIntentos;
+      document.getElementById('lock-err').textContent=
+        `Clave incorrecta. ${restantes} intento${restantes!==1?'s':''} restante${restantes!==1?'s':''}.`;
+      document.getElementById('lock-attempts').textContent='';
+      inp.focus();
+    }
+  }
+}
+
+function cerrarLock(){
+  document.getElementById('lock-bg').classList.remove('open');
+}
+
+function toggleLockEye(){
+  const inp = document.getElementById('lock-input');
+  const eye = document.getElementById('lock-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁️';}
+  inp.focus();
+}
+
+function cerrarSesionAdmin(){
+  if(!confirm('¿Cerrar la sesión de administrador?')) return;
+  adminSesionActiva = false;
+  clearTimeout(inactividadTimer);
+  setTab('pensum');
+  toast('ok','Sesión cerrada','Volviste al modo estudiante');
+}
+
+// Auto-logout por inactividad (30 min)
+let inactividadTimer;
+function resetInactividadTimer(){
+  clearTimeout(inactividadTimer);
+  inactividadTimer = setTimeout(()=>{
+    if(adminSesionActiva){
+      adminSesionActiva=false;
+      if(currentTab==='admin') setTab('pensum');
+      toast('warn','Sesión expirada','La sesión de administrador cerró por inactividad (30 min)');
+    }
+  }, 30*60*1000);
+}
+// Renovar el timer con cualquier actividad del admin
+document.addEventListener('click', ()=>{ if(adminSesionActiva) resetInactividadTimer(); });
+document.addEventListener('keydown', e=>{
+  if(adminSesionActiva) resetInactividadTimer();
+});
+
+// Proteger el tab admin: si alguien navega al #admin manualmente
+const _origSetTab = setTab;
 
 // INICIO — conectar Firebase automáticamente
 render();
