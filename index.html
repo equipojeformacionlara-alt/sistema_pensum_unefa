@@ -580,43 +580,12 @@ function saveStudent(){
 // ═══════════════════════════════════════════════════════
 // LÓGICA PRELACIONES
 // ═══════════════════════════════════════════════════════
-// ======================================================
-// 🔵 ESTADO REAL DE UNA MATERIA (CORREGIDO)
-// ======================================================
 function getEstado(id){
-  const m = mMap[id];
-  if(!m) return 'bloqueada';
-
-  // Si está aprobada → aprobada
-  if(aprobadas.has(id)) return 'aprobada';
-
-  // Si está inactiva → bloqueada
-  if(m.activa === false) return 'bloqueada';
-
-  // Si no tiene prelaciones → disponible
-  if(!m.prereqs || m.prereqs.length === 0) return 'disponible';
-
-  // Si todas las prelaciones están aprobadas → disponible
-  const cumple = m.prereqs.every(p => aprobadas.has(p));
-  return cumple ? 'disponible' : 'bloqueada';
+  if(aprobadas.has(id))return'aprobada';
+  const m=mMap[id];
+  if(!m||!m.prereqs||!m.prereqs.length)return'disponible';
+  return m.prereqs.every(p=>aprobadas.has(p))?'disponible':'bloqueada';
 }
-
-// ======================================================
-// 🔵 MATERIAS DISPONIBLES REALES
-// ======================================================
-function materiasDisponibles(){
-  return MATERIAS.filter(m => getEstado(m.id) === 'disponible');
-}
-
-// ======================================================
-// 🔵 PRÓXIMO SEMESTRE REAL
-// ======================================================
-function calcularProximoSemestre(){
-  return MATERIAS
-    .filter(m => getEstado(m.id) === 'disponible')
-    .sort((a,b) => a.sem - b.sem);
-}
-
 function getFaltantes(id){return(mMap[id]?.prereqs||[]).filter(p=>!aprobadas.has(p));}
 function ucAp(){return[...aprobadas].reduce((s,id)=>s+(mMap[id]?.uc||0),0);}
 function semCompleto(s){const ms=MATERIAS.filter(m=>m.sem===s);return ms.length>0&&ms.every(m=>aprobadas.has(m.id));}
@@ -797,7 +766,7 @@ function showDetail(id){
           </select>
         </div>`:''}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-        <button class="btn pur sm" onclick="abrirModal('${id}')">✏️ Editar en Firebase</button>
+        <button class="btn pur sm" onclick="adminSesionActiva?abrirModal('${id}'):pedirClave()">✏️ Editar en Firebase</button>
       </div>
     </div>
     <div class="sec-title" style="padding:0 0 0 2px;margin-bottom:8px;">Prelaciones / Prerrequisitos</div>
@@ -847,81 +816,89 @@ function renderCharts(){
   });
 }
 
-// ======================================================
-// 🔵 PRÓXIMO PERÍODO DE INSCRIPCIÓN (CORREGIDO)
-// ======================================================
-// ======================================================
-// 🔵 PRÓXIMO PERÍODO DE INSCRIPCIÓN (CORREGIDO)
-// ======================================================
 function renderProximo(){
   const g = document.getElementById('next-sem-grid');
 
-  // Materias realmente disponibles
-  const disp = materiasDisponibles();
+  // ── Todas las materias NO aprobadas, ordenadas por semestre ──
+  const noAprobadas = MATERIAS.filter(m => !aprobadas.has(m.id)).sort((a,b) => a.sem - b.sem);
 
-  if(!disp.length){
-    g.innerHTML = `<p style="font-size:13px;color:var(--text3);padding:10px;">No hay materias disponibles actualmente.</p>`;
-    return;
-  }
+  // Separar disponibles vs bloqueadas
+  const todasDisp = noAprobadas.filter(m => getEstado(m.id) === 'disponible');
+  const todasBloq = noAprobadas.filter(m => getEstado(m.id) === 'bloqueada');
 
-  // Ordenar por semestre
-  const ordenadas = disp.sort((a,b)=>a.sem - b.sem);
-
-  // Calcular UC dentro del límite
-  let dentro = [], fuera = [], uc = 0;
-  ordenadas.forEach(m=>{
-    if(uc + m.uc <= MAX_UC){
-      dentro.push(m);
-      uc += m.uc;
-    } else {
-      fuera.push(m);
-    }
+  // Aplicar límite de 33 UC sobre las disponibles
+  let ua = 0;
+  const dentro = [], fuera = [];
+  todasDisp.forEach(m => {
+    if(ua + m.uc <= MAX_UC){ dentro.push(m); ua += m.uc; }
+    else { fuera.push(m); }
   });
 
-  // Bloqueadas reales
-  const bloq = MATERIAS.filter(m => getEstado(m.id) === 'bloqueada');
+  // Detectar rezagadas (de semestres anteriores al más bajo incompleto)
+  let ns = 9;
+  for(let s = 1; s <= 9; s++){ if(!semCompleto(s)){ ns = s; break; } }
+  const rezCount = todasDisp.filter(m => m.sem < ns).length;
 
   g.innerHTML = `
-    <div style="grid-column:1/-1;margin-bottom:8px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;display:flex;gap:12px;flex-wrap:wrap;">
-      <span>📅 <strong style="color:var(--accent)">Próximo período</strong></span>
-      <span>🎒 <strong style="color:var(--green)">${uc}/${MAX_UC} UC</strong></span>
+    <div style="grid-column:1/-1;margin-bottom:8px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <span>📅 <strong style="color:var(--accent)">Período de inscripción</strong></span>
+      <span>🎒 <strong style="color:var(--green)">${ua} / ${MAX_UC} UC</strong> a inscribir</span>
+      <span style="color:var(--text2)">📋 ${todasDisp.length} disponibles en total</span>
+      ${rezCount > 0 ? `<span style="color:var(--yellow)">⚠️ ${rezCount} rezagada${rezCount>1?'s':''}</span>` : ''}
     </div>
 
     <div class="next-sem-col">
-      <h4 class="can">✅ Puede inscribir (${dentro.length}) · ${uc} UC</h4>
-      ${
-        dentro.map(m=>`
-          <div class="next-mat-item can">
-            <div style="font-size:13px">🟢</div>
-            <div>
-              <div class="nmi-name">${m.nombre}</div>
-              <div class="nmi-detail">${m.uc} UC · Sem ${m.sem}</div>
-            </div>
-          </div>
-        `).join('')
+      <h4 class="can">✅ Puede inscribir (${dentro.length}) · ${ua} UC</h4>
+      ${dentro.length === 0
+        ? '<p style="font-size:12px;color:var(--text3);padding:8px 0;">Sin materias disponibles actualmente.</p>'
+        : dentro.map(m => {
+            const h = historial[m.id] || 'nueva';
+            const tag = h==='repite_1'?' <span style="color:var(--orange);font-size:10px;">(R1)</span>'
+                       :h==='repite_2'?' <span style="color:var(--orange);font-size:10px;">(R2 ⚠️)</span>'
+                       :h==='repite_3'?' <span style="color:var(--red);font-size:10px;">(🚨 ÚLTIMO)</span>':'';
+            const esRez = m.sem < ns;
+            return `<div class="next-mat-item can">
+              <div style="font-size:13px;flex-shrink:0">${esRez ? '⚠️' : '🟢'}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="nmi-name">${m.nombre}${tag}</div>
+                <div class="nmi-detail">${m.uc} UC · Sem ${m.sem}${esRez ? ' · <span style="color:var(--yellow)">Rezagada</span>' : ''}</div>
+              </div>
+            </div>`;
+          }).join('')
       }
+      ${fuera.length > 0 ? `
+        <div style="margin-top:10px;padding:9px 11px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:8px;">
+          <div style="font-size:10px;font-weight:700;color:var(--yellow);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">
+            ⚡ Supera el límite de ${MAX_UC} UC — inscribir en período posterior
+          </div>
+          ${fuera.map(m => `
+            <div style="font-size:11px;padding:4px 0;border-bottom:1px solid rgba(251,191,36,.08);display:flex;gap:8px;align-items:center;">
+              <span style="color:var(--yellow)">→</span>
+              <span style="flex:1">${m.nombre}</span>
+              <span style="color:var(--text2);font-family:var(--mono);font-size:10px;">${m.uc} UC · S${m.sem}</span>
+            </div>`).join('')}
+        </div>` : ''}
     </div>
 
     <div class="next-sem-col">
-      <h4 class="cant">🔒 Bloqueadas (${bloq.length})</h4>
-      ${
-        bloq.map(m=>{
-          const f = getFaltantes(m.id);
-          return `
-            <div class="next-mat-item cant">
-              <div style="font-size:13px">🔒</div>
-              <div>
+      <h4 class="cant">🔒 Bloqueadas — faltan prelaciones (${todasBloq.length})</h4>
+      ${todasBloq.length === 0
+        ? '<p style="font-size:12px;color:var(--text3);padding:8px 0;">¡Sin materias bloqueadas!</p>'
+        : todasBloq.slice(0, 30).map(m => {
+            const f = getFaltantes(m.id);
+            return `<div class="next-mat-item cant">
+              <div style="font-size:13px;flex-shrink:0">🔒</div>
+              <div style="flex:1;min-width:0;">
                 <div class="nmi-name">${m.nombre}</div>
                 <div class="nmi-detail">${m.uc} UC · Sem ${m.sem}</div>
-                <div class="nmi-falt">Falta: ${f.map(x=>mMap[x]?.nombre||x).join(', ')}</div>
+                <div class="nmi-falt">Falta: ${f.slice(0,3).map(x=>mMap[x]?.nombre||x).join(', ')}${f.length>3?` +${f.length-3} más`:''}</div>
               </div>
-            </div>
-          `;
-        }).join('')
+            </div>`;
+          }).join('') + (todasBloq.length > 30 ? `<p style="font-size:11px;color:var(--text3);padding:6px 0;text-align:center;">... y ${todasBloq.length-30} más bloqueadas</p>` : '')
       }
-    </div>
-  `;
+    </div>`;
 }
+
 // ═══════════════════════════════════════════════════════
 // MAPA
 // ═══════════════════════════════════════════════════════
@@ -1154,8 +1131,9 @@ function exportExcel(){
   const ws4=XLSX.utils.aoa_to_sheet(ws4r);ws4['!cols']=[{wch:16},{wch:40},{wch:12},{wch:5},{wch:13},{wch:50}];
   XLSX.utils.book_append_sheet(wb,ws4,'Pendientes');
   // ── HOJA 5: Materias Disponibles — Próximo Período ──────────────
-  // Calcula qué puede inscribir el estudiante (límite: MAX_UC UC)
-  const _dispOrdenadas = materiasDisponibles().sort((a,b)=>a.sem - b.sem);
+  const _dispOrdenadas = MATERIAS
+    .filter(m => !aprobadas.has(m.id) && getEstado(m.id) === 'disponible')
+    .sort((a,b) => a.sem - b.sem);
   let _ucPer=0; const _dentroPer=[]; const _fueraPer=[];
   _dispOrdenadas.forEach(m=>{
     if(_ucPer+m.uc<=MAX_UC){ _dentroPer.push(m); _ucPer+=m.uc; }
@@ -1257,10 +1235,6 @@ document.addEventListener('keydown',e=>{
 // └─────────────────────────────────────────────────────────────┘
 const ADMIN_CLAVE = 'DIN2026';   // ← CAMBIA AQUÍ LA CLAVE
 
-// Hash simple para no exponer la clave en texto plano en memoria
-function hashStr(s){ let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0;}return h.toString(36);}
-const ADMIN_HASH_ENCODED = hashStr(ADMIN_CLAVE);
-
 let adminSesionActiva = false;
 let lockIntentos = 0;
 const MAX_INTENTOS = 5;
@@ -1315,7 +1289,7 @@ function verificarClave(){
   const val = inp.value;
   if(!val){ inp.classList.add('error'); setTimeout(()=>inp.classList.remove('error'),500); return; }
 
-  if(hashStr(val) === ADMIN_HASH_ENCODED){
+  if(val === ADMIN_CLAVE){
     // CLAVE CORRECTA
     lockIntentos = 0;
     lockBloqueadoHasta = 0;
